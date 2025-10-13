@@ -7,13 +7,18 @@ import com.mybatisflex.annotation.Table;
 import com.mybatisflex.core.keygen.KeyGenerators;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import org.dows.rade.crud.AutoFillDataListener;
+import org.dows.rade.crud.BaseEntity;
 
-import java.time.OffsetDateTime;
+import java.util.Date;
 
+@EqualsAndHashCode(callSuper = true)
 @Data
-@Table("member_instance")
-@Schema(name = "MemberInstanceEntity")
-public class MemberInstanceEntity {
+@Table(value = "member_instance", onUpdate = AutoFillDataListener.class, onInsert = AutoFillDataListener.class)
+@Schema(name = "会员实例表")
+public class MemberInstanceEntity extends BaseEntity<MemberInstanceEntity> {
+
     @Id(keyType = KeyType.Generator, value = KeyGenerators.snowFlakeId)
     private Long memberInstanceId;
 
@@ -27,8 +32,26 @@ public class MemberInstanceEntity {
     private String membershipType;
 
     @Column(value = "membership_effective_date", comment = "会员生效日期")
-    private OffsetDateTime membershipEffectiveDate;
+    private Date membershipEffectiveDate;
 
     @Column(value = "membership_expiry_date", comment = "会员过期日期")
-    private OffsetDateTime membershipExpiryDate;
+    private Date membershipExpiryDate;
+
+    @Column(value = "app_id", comment = "应用ID")
+    private String appId;
+
+    @Column(value = "operator_id", comment = "操作者ID")
+    private Long operatorId;
+
+    @Column(value = "ver", comment = "乐观锁", onUpdateValue = "ver+1")
+    private Integer ver;
+
+    @Column(value = "deleted", comment = "逻辑删除", isLogicDelete = true)
+    private Integer deleted;
+
+    @Column(value = "ts", comment = "操作时间")
+    private Date ts;
+
+    @Column(value = "ut", comment = "更新时间")
+    private Date ut;
 }

@@ -15,7 +15,7 @@ public class UserMemberInstanceRest implements UserMemberInstanceApi {
     private final MemberInstanceHandler instanceHandler;
 
     @Override
-    public Long save(MemberInstancerSaveRequest request) {
+    public Long save(MemberInstanceSaveRequest request) {
         return instanceHandler.save(request);
     }
 

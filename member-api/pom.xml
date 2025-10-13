@@ -3,33 +3,29 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <groupId>org.dows.member</groupId>
+    <groupId>org.dows.cloud</groupId>
     <artifactId>dows-member</artifactId>
-    <version>1.0.0</version>
+    <version>${revision}</version>
   </parent>
   <artifactId>member-api</artifactId>
-  <name>member-api</name>
 
   <dependencies>
     <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter-web</artifactId>
+      <groupId>org.dows.framework</groupId>
+      <artifactId>rade-api</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.springdoc</groupId>
-      <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
-      <version>${springdoc.version}</version>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-web</artifactId>
     </dependency>
+    <dependency>
+      <groupId>org.dows.framework</groupId>
+      <artifactId>rade-core</artifactId>
+    </dependency>
+
     <dependency>
       <groupId>io.swagger.core.v3</groupId>
-      <artifactId>swagger-annotations-jakarta</artifactId>
-      <version>${swagger.annotations.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.projectlombok</groupId>
-      <artifactId>lombok</artifactId>
-      <version>${lombok.version}</version>
-      <scope>provided</scope>
+      <artifactId>swagger-core-jakarta</artifactId>
     </dependency>
   </dependencies>
 </project>

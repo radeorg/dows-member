@@ -1,40 +1,26 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <parent>
+    <groupId>org.dows.framework</groupId>
+    <artifactId>rade-parent</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+  </parent>
+
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>org.dows.member</groupId>
+  <groupId>org.dows.cloud</groupId>
   <artifactId>dows-member</artifactId>
-  <version>1.0.0</version>
+  <version>${revision}</version>
   <packaging>pom</packaging>
   <name>dows-member</name>
   <description>会员系统多模块项目</description>
 
   <properties>
-    <java.version>21</java.version>
-    <spring-boot.version>3.3.4</spring-boot.version>
-    <springdoc.version>2.6.0</springdoc.version>
-    <swagger.annotations.version>2.2.22</swagger.annotations.version>
-    <lombok.version>1.18.32</lombok.version>
-    <mybatis-flex.version>1.9.8</mybatis-flex.version>
-    <feign.version>12.5</feign.version>
-    <mysql.driver.version>8.3.0</mysql.driver.version>
-    <postgres.driver.version>42.7.3</postgres.driver.version>
-    <maven.compiler.source>21</maven.compiler.source>
-    <maven.compiler.target>21</maven.compiler.target>
+    <revision>1.0.0-SNAPSHOT</revision>
+    <mybatis-flex.ext.version>1.10.8.110</mybatis-flex.ext.version>
+    <jdk.version>21</jdk.version>
   </properties>
-
-  <dependencyManagement>
-    <dependencies>
-      <dependency>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-dependencies</artifactId>
-        <version>${spring-boot.version}</version>
-        <type>pom</type>
-        <scope>import</scope>
-      </dependency>
-    </dependencies>
-  </dependencyManagement>
 
   <modules>
     <module>member-api</module>
@@ -48,14 +34,90 @@
     <module>member-dao</module>
   </modules>
 
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <artifactId>member-rest</artifactId>
+        <groupId>org.dows.cloud</groupId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <artifactId>member-rpc</artifactId>
+        <groupId>org.dows.cloud</groupId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <artifactId>member-api</artifactId>
+        <groupId>org.dows.cloud</groupId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <artifactId>member-boot</artifactId>
+        <groupId>org.dows.cloud</groupId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <artifactId>member-core</artifactId>
+        <groupId>org.dows.cloud</groupId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <artifactId>member-handler</artifactId>
+        <groupId>org.dows.cloud</groupId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <artifactId>member-biz</artifactId>
+        <groupId>org.dows.cloud</groupId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <artifactId>member-dao</artifactId>
+        <groupId>org.dows.cloud</groupId>
+        <version>${project.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>commons-validator</groupId>
+        <artifactId>commons-validator</artifactId>
+        <version>1.10.0</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-dependencies</artifactId>
+        <version>${spring-boot.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+
   <build>
-    <pluginManagement>
-      <plugins>
-        <plugin>
-          <groupId>org.springframework.boot</groupId>
-          <artifactId>spring-boot-maven-plugin</artifactId>
-        </plugin>
-      </plugins>
-    </pluginManagement>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <annotationProcessorPaths>
+            <path>
+              <groupId>org.projectlombok</groupId>
+              <artifactId>lombok</artifactId>
+            </path>
+          </annotationProcessorPaths>
+        </configuration>
+      </plugin>
+    </plugins>
   </build>
+
+  <distributionManagement>
+    <repository>
+      <id>2290151-snapshot-aLhHBl</id>
+      <url>https://packages.aliyun.com/634f4de0327f73640e96c28d/maven/2290151-snapshot-alhhbl</url>
+    </repository>
+    <snapshotRepository>
+      <id>2290151-snapshot-aLhHBl</id>
+      <url>https://packages.aliyun.com/634f4de0327f73640e96c28d/maven/2290151-snapshot-alhhbl</url>
+    </snapshotRepository>
+  </distributionManagement>
 </project>

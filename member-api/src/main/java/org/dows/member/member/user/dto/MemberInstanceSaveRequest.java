@@ -6,9 +6,8 @@ import lombok.Data;
 import java.util.Date;
 
 @Data
-@Schema(name = "MemberInstanceIdGetResponse", description = "会员实例详情响应")
-public class MemberInstanceIdGetResponse {
-    private Long memberInstanceId;
+@Schema(name = "MemberInstanceSaveRequest", description = "新增会员实例请求")
+public class MemberInstanceSaveRequest {
     private Long accountInstanceId;
     private Long memberInterestsId;
     private String membershipType;

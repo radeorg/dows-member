@@ -7,13 +7,18 @@ import com.mybatisflex.annotation.Table;
 import com.mybatisflex.core.keygen.KeyGenerators;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import org.dows.rade.crud.AutoFillDataListener;
+import org.dows.rade.crud.BaseEntity;
 
-import java.time.OffsetDateTime;
+import java.util.Date;
 
+@EqualsAndHashCode(callSuper = true)
 @Data
-@Table("member_change")
-@Schema(name = "MemberChangeEntity")
-public class MemberChangeEntity {
+@Schema(name = "会员等级变更表")
+@Table(value = "member_change", onUpdate = AutoFillDataListener.class, onInsert = AutoFillDataListener.class)
+public class MemberChangeEntity extends BaseEntity<MemberChangeEntity> {
+
     @Id(keyType = KeyType.Generator, value = KeyGenerators.snowFlakeId)
     private Long memberChangeId;
 
@@ -22,9 +27,6 @@ public class MemberChangeEntity {
 
     @Column(value = "account_instance_id", comment = "账号实例ID")
     private String accountInstanceId;
-
-    @Column(value = "app_id", comment = "应用ID")
-    private String appId;
 
     @Column(value = "previous_member_interests_id", comment = "变更前会员权益ID")
     private Long previousMemberInterestsId;
@@ -42,26 +44,29 @@ public class MemberChangeEntity {
     private String changeType;
 
     @Column(value = "effective_date", comment = "生效时间")
-    private OffsetDateTime effectiveDate;
+    private Date effectiveDate;
 
     @Column(value = "expiry_date", comment = "过期时间")
-    private OffsetDateTime expiryDate;
+    private Date expiryDate;
 
     @Column(value = "note", comment = "变更备注")
     private String note;
 
+    @Column(value = "app_id", comment = "应用ID")
+    private String appId;
+
     @Column(value = "operator_id", comment = "操作者ID")
     private Long operatorId;
 
-    @Column(value = "ver", comment = "乐观锁")
-    private Long ver;
+    @Column(value = "ver", comment = "乐观锁", onUpdateValue = "ver+1")
+    private Integer ver;
 
-    @Column(value = "deleted", comment = "逻辑删除")
-    private Byte deleted;
+    @Column(value = "deleted", comment = "逻辑删除", isLogicDelete = true)
+    private Integer deleted;
 
     @Column(value = "ts", comment = "操作时间")
-    private OffsetDateTime ts;
+    private Date ts;
 
     @Column(value = "ut", comment = "更新时间")
-    private OffsetDateTime ut;
+    private Date ut;
 }

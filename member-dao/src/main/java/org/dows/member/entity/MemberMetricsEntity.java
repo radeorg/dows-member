@@ -7,13 +7,18 @@ import com.mybatisflex.annotation.Table;
 import com.mybatisflex.core.keygen.KeyGenerators;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import org.dows.rade.crud.AutoFillDataListener;
+import org.dows.rade.crud.BaseEntity;
 
-import java.time.OffsetDateTime;
+import java.util.Date;
 
+@EqualsAndHashCode(callSuper = true)
 @Data
-@Table("member_metrics")
-@Schema(name = "MemberMetricsEntity")
-public class MemberMetricsEntity {
+@Table(value = "member_metrics", onUpdate = AutoFillDataListener.class, onInsert = AutoFillDataListener.class)
+@Schema(name = "会员度量表")
+public class MemberMetricsEntity extends BaseEntity<MemberMetricsEntity> {
+
     @Id(keyType = KeyType.Generator, value = KeyGenerators.snowFlakeId)
     private Long memberMetricsId;
 
@@ -53,15 +58,15 @@ public class MemberMetricsEntity {
     @Column(value = "operator_id", comment = "操作者ID")
     private Long operatorId;
 
-    @Column(value = "ver", comment = "乐观锁")
-    private Long ver;
+    @Column(value = "ver", comment = "乐观锁", onUpdateValue = "ver+1")
+    private Integer ver;
 
-    @Column(value = "deleted", comment = "逻辑删除")
-    private Byte deleted;
+    @Column(value = "deleted", comment = "逻辑删除", isLogicDelete = true)
+    private Integer deleted;
 
     @Column(value = "ts", comment = "操作时间")
-    private OffsetDateTime ts;
+    private Date ts;
 
     @Column(value = "ut", comment = "更新时间")
-    private OffsetDateTime ut;
+    private Date ut;
 }

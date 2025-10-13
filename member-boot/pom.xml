@@ -3,23 +3,17 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <groupId>org.dows.member</groupId>
+    <groupId>org.dows.cloud</groupId>
     <artifactId>dows-member</artifactId>
-    <version>1.0.0</version>
+    <version>${revision}</version>
   </parent>
   <artifactId>member-boot</artifactId>
   <name>member-boot</name>
 
   <dependencies>
     <dependency>
-      <groupId>org.dows.member</groupId>
-      <artifactId>member-core</artifactId>
-      <version>1.0.0</version>
-    </dependency>
-    <dependency>
-      <groupId>org.dows.member</groupId>
+      <groupId>org.dows.cloud</groupId>
       <artifactId>member-rest</artifactId>
-      <version>1.0.0</version>
     </dependency>
   </dependencies>
 </project>

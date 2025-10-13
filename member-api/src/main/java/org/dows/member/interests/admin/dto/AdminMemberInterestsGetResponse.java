@@ -3,7 +3,7 @@ package org.dows.member.interests.admin.dto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
-import java.time.OffsetDateTime;
+import java.util.Date;
 
 @Data
 @Schema(name = "AdminMemberInterestsGetResponse", description = "会员权益响应对象")
@@ -23,6 +23,6 @@ public class AdminMemberInterestsGetResponse {
     private Boolean disabled;
     private Long operatorId;
     private String operator;
-    private OffsetDateTime ts;
-    private OffsetDateTime ut;
+    private Date ts;
+    private Date ut;
 }

@@ -7,13 +7,17 @@ import com.mybatisflex.annotation.Table;
 import com.mybatisflex.core.keygen.KeyGenerators;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import org.dows.rade.crud.AutoFillDataListener;
+import org.dows.rade.crud.BaseEntity;
 
-import java.time.OffsetDateTime;
+import java.util.Date;
 
+@EqualsAndHashCode(callSuper = true)
 @Data
-@Table("member_interests")
-@Schema(name = "MemberInterestsEntity")
-public class MemberInterestsEntity {
+@Table(value = "member_interests", onUpdate = AutoFillDataListener.class, onInsert = AutoFillDataListener.class)
+@Schema(name = "会员权益表")
+public class MemberInterestsEntity extends BaseEntity<MemberInterestsEntity> {
     @Id(keyType = KeyType.Generator, value = KeyGenerators.snowFlakeId)
     private Long memberInterestsId;
 
@@ -39,32 +43,32 @@ public class MemberInterestsEntity {
     private Integer activeInterviewCount;
 
     @Column(value = "email_push_enabled", comment = "邮件推送功能开关")
-    private Byte emailPushEnabled;
+    private Integer emailPushEnabled;
 
     @Column(value = "use_date", comment = "使用时间段")
     private String useDate;
 
     @Column(value = "holiday_exclude", comment = "是否排除节假日")
-    private Byte holidayExclude;
+    private Integer holidayExclude;
 
     @Column(value = "matching_priority", comment = "匹配优先级")
     private Integer matchingPriority;
 
     @Column(value = "disabled", comment = "是否禁用")
-    private Byte disabled;
+    private Integer disabled;
 
     @Column(value = "operator_id", comment = "操作者ID")
     private Long operatorId;
 
-    @Column(value = "ver", comment = "乐观锁")
-    private Long ver;
+    @Column(value = "ver", comment = "乐观锁", onUpdateValue = "ver+1")
+    private Integer ver;
 
-    @Column(value = "deleted", comment = "逻辑删除")
-    private Byte deleted;
+    @Column(value = "deleted", comment = "逻辑删除", isLogicDelete = true)
+    private Integer deleted;
 
     @Column(value = "ts", comment = "操作时间")
-    private OffsetDateTime ts;
+    private Date ts;
 
     @Column(value = "ut", comment = "更新时间")
-    private OffsetDateTime ut;
+    private Date ut;
 }

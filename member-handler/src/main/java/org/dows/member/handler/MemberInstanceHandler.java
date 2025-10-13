@@ -6,11 +6,11 @@ import org.dows.member.entity.MemberInstanceEntity;
 import org.dows.member.entity.MemberMetricsEntity;
 import org.dows.member.service.MemberChangeService;
 import org.dows.member.service.MemberInstanceService;
-import org.dows.member.dao.service.MemberMetricsService;
+import org.dows.member.service.MemberMetricsService;
 import org.dows.member.member.user.dto.*;
 import org.springframework.stereotype.Component;
 
-import java.time.OffsetDateTime;
+import java.util.Date;
 
 @Component
 @RequiredArgsConstructor
@@ -19,7 +19,7 @@ public class MemberInstanceHandler {
     private final MemberChangeService changeService;
     private final MemberMetricsService metricsService;
 
-    public Long save(MemberInstancerSaveRequest req) {
+    public Long save(MemberInstanceSaveRequest req) {
         MemberInstanceEntity e = new MemberInstanceEntity();
         e.setAccountInstanceId(req.getAccountInstanceId());
         e.setMemberInterestsId(req.getMemberInterestsId());
@@ -36,7 +36,7 @@ public class MemberInstanceHandler {
         change.setMemberInstanceId(req.getMemberInstanceId());
         change.setNewMemberInterestsId(req.getMemberInterestsId());
         change.setChangeType("upgrade");
-        change.setEffectiveDate(OffsetDateTime.now());
+        change.setEffectiveDate(new Date());
         changeService.save(change);
         return true;
     }
@@ -46,7 +46,7 @@ public class MemberInstanceHandler {
         change.setMemberInstanceId(req.getMemberInstanceId());
         change.setNewMemberInterestsId(req.getMemberInterestsId());
         change.setChangeType("renewal");
-        change.setEffectiveDate(OffsetDateTime.now());
+        change.setEffectiveDate(new Date());
         changeService.save(change);
         return true;
     }

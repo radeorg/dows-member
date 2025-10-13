@@ -11,7 +11,7 @@ public interface UserMemberInstanceApi {
 
     @PostMapping("/save")
     @Operation(summary = "新增会员实例")
-    Long save(@RequestBody MemberInstancerSaveRequest request);
+    Long save(@RequestBody MemberInstanceSaveRequest request);
 
     @PostMapping("/upgrade")
     @Operation(summary = "升级")
