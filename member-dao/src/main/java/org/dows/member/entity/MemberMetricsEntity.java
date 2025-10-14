@@ -31,17 +31,17 @@ public class MemberMetricsEntity extends BaseEntity<MemberMetricsEntity> {
     @Column(value = "member_interests_id", comment = "会员权益ID")
     private Long memberInterestsId;
 
-    @Column(value = "match_count", comment = "可使用匹配简历总数")
-    private Integer matchCount;
+    @Column(value = "daily_match_count", comment = "每日可使用匹配简历上限")
+    private Integer dailyMatchCount;
 
     @Column(value = "used_match_count", comment = "已使用匹配简历数")
     private Integer usedMatchCount;
 
-    @Column(value = "invite_count", comment = "可使用邀约总数")
-    private Integer inviteCount;
+    @Column(value = "active_interview_count", comment = "可使用同时面试邀约上限")
+    private Integer activeInterviewCount;
 
-    @Column(value = "used_invite_count", comment = "已使用邀约数")
-    private Integer usedInviteCount;
+    @Column(value = "used_interview_count", comment = "已使用邀约数")
+    private Integer usedInterviewCount;
 
     @Column(value = "creation_jd_count", comment = "可使创建JD总数")
     private Integer creationJdCount;

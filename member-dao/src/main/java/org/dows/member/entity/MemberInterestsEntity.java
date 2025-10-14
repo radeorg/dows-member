@@ -18,6 +18,12 @@ import java.util.Date;
 @Table(value = "member_interests", onUpdate = AutoFillDataListener.class, onInsert = AutoFillDataListener.class)
 @Schema(name = "会员权益表")
 public class MemberInterestsEntity extends BaseEntity<MemberInterestsEntity> {
+
+    @Override
+    public Long getId() {
+        return memberInterestsId;
+    }
+
     @Id(keyType = KeyType.Generator, value = KeyGenerators.snowFlakeId)
     private Long memberInterestsId;
 
@@ -54,8 +60,8 @@ public class MemberInterestsEntity extends BaseEntity<MemberInterestsEntity> {
     @Column(value = "matching_priority", comment = "匹配优先级")
     private Integer matchingPriority;
 
-    @Column(value = "disabled", comment = "是否禁用")
-    private Integer disabled;
+    @Column(value = "state", comment = "状态，0正常，1禁用")
+    private Integer state;
 
     @Column(value = "operator_id", comment = "操作者ID")
     private Long operatorId;

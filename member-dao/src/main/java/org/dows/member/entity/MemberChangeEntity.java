@@ -26,7 +26,7 @@ public class MemberChangeEntity extends BaseEntity<MemberChangeEntity> {
     private Long memberInstanceId;
 
     @Column(value = "account_instance_id", comment = "账号实例ID")
-    private String accountInstanceId;
+    private Long accountInstanceId;
 
     @Column(value = "previous_member_interests_id", comment = "变更前会员权益ID")
     private Long previousMemberInterestsId;
@@ -51,6 +51,9 @@ public class MemberChangeEntity extends BaseEntity<MemberChangeEntity> {
 
     @Column(value = "note", comment = "变更备注")
     private String note;
+
+    @Column(value = "new_interests_info", comment = "变更后会员权益详细信息")
+    private String newInterestsInfo;
 
     @Column(value = "app_id", comment = "应用ID")
     private String appId;

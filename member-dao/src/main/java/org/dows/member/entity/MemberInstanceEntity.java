@@ -28,14 +28,14 @@ public class MemberInstanceEntity extends BaseEntity<MemberInstanceEntity> {
     @Column(value = "member_interests_id", comment = "会员权益ID")
     private Long memberInterestsId;
 
-    @Column(value = "membership_type", comment = "会员等级")
-    private String membershipType;
+    @Column(value = "member_type", comment = "会员等级")
+    private String memberType;
 
-    @Column(value = "membership_effective_date", comment = "会员生效日期")
-    private Date membershipEffectiveDate;
+    @Column(value = "effective_date", comment = "会员生效日期")
+    private Date effectiveDate;
 
-    @Column(value = "membership_expiry_date", comment = "会员过期日期")
-    private Date membershipExpiryDate;
+    @Column(value = "expiry_date", comment = "会员过期日期")
+    private Date expiryDate;
 
     @Column(value = "app_id", comment = "应用ID")
     private String appId;
