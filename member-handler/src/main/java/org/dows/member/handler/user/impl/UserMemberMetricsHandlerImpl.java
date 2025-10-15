@@ -4,6 +4,8 @@ import cn.hutool.core.bean.BeanUtil;
 import com.mybatisflex.core.query.QueryWrapper;
 import lombok.RequiredArgsConstructor;
 import org.dows.member.constant.MemberExceptionStatusCode;
+import org.dows.member.entity.MemberInstanceEntity;
+import org.dows.member.entity.MemberInterestsEntity;
 import org.dows.member.entity.MemberMetricsEntity;
 import org.dows.member.exception.MemberException;
 import org.dows.member.handler.user.UserMemberMetricsHandler;
@@ -21,23 +23,39 @@ public class UserMemberMetricsHandlerImpl implements UserMemberMetricsHandler {
     public final MemberMetricsService memberMetricsService;
 
     @Override
-    public Long dailySave(Long accountInstanceId) {
-        MemberMetricsEntity metrics = getNewestByAccountInstanceId(accountInstanceId);
-        if (Objects.nonNull(metrics) && !CommonUtils.isToday(metrics.getTs())) {
-            MemberMetricsEntity entity = new MemberMetricsEntity();
-            entity.setAppId(metrics.getAppId());
-            entity.setAccountInstanceId(metrics.getAccountInstanceId());
-            entity.setMemberInstanceId(metrics.getMemberInstanceId());
-            entity.setMemberInterestsId(metrics.getMemberInterestsId());
-            entity.setDailyMatchCount(0);
-            entity.setActiveInterviewCount(metrics.getActiveInterviewCount());
-            entity.setCreationJdCount(metrics.getCreationJdCount());
-            entity.setSingleUploadCount(metrics.getSingleUploadCount());
-            memberMetricsService.save(entity);
+    public void saveOrUpdate(MemberInstanceEntity instance, MemberInterestsEntity interests) {
+        MemberMetricsEntity entity = new MemberMetricsEntity();
+        entity.setAppId(instance.getAppId());
+        entity.setAccountInstanceId(instance.getAccountInstanceId());
+        entity.setMemberInstanceId(instance.getMemberInstanceId());
+        entity.setMemberInterestsId(instance.getMemberInterestsId());
+        entity.setDailyMatchCount(interests.getDailyMatchCount());
+        entity.setActiveInterviewCount(interests.getActiveInterviewCount());
+        entity.setCreationJdCount(interests.getCreationJdCount());
+        entity.setSingleUploadCount(interests.getSingleUploadCount());
 
-            return entity.getMemberMetricsId();
+        // 查询最新一条会员度量数据
+        MemberMetricsEntity metrics = getNewestByAccountInstanceId(instance.getAccountInstanceId());
+        if (metrics == null) {
+            memberMetricsService.save(entity);
+        } else {
+            if (!CommonUtils.isToday(metrics.getTs())) {
+                // 如果今日未生成校验数据，将历史使用的次数进行赋值
+                entity.setUsedMatchCount(metrics.getUsedMatchCount());
+                entity.setUsedInterviewCount(metrics.getUsedInterviewCount());
+                entity.setUsedCreationJdCount(metrics.getUsedCreationJdCount());
+
+                memberMetricsService.save(entity);
+            } else {
+                // 如果今日已生成校验数据（比如在线程执行期间进行了续费等操作），进行更新
+                metrics.setActiveInterviewCount(interests.getActiveInterviewCount());
+                metrics.setDailyMatchCount(interests.getDailyMatchCount());
+                metrics.setSingleUploadCount(interests.getSingleUploadCount());
+                metrics.setCreationJdCount(interests.getCreationJdCount());
+
+                memberMetricsService.updateById(entity);
+            }
         }
-        return 0L;
     }
 
     @Override

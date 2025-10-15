@@ -11,6 +11,10 @@
 
   <dependencies>
     <dependency>
+      <groupId>org.dows.cloud</groupId>
+      <artifactId>member-core</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.dows.framework</groupId>
       <artifactId>rade-api</artifactId>
     </dependency>

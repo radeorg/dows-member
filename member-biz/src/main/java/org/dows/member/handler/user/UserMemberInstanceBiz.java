@@ -24,5 +24,5 @@ public interface UserMemberInstanceBiz {
     /**
      * 每日线程执行：会员到期
      */
-    Boolean expiration(Long memberInstanceId);
+    Boolean due(Long memberInstanceId);
 }

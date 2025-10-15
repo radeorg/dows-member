@@ -11,6 +11,8 @@ import org.dows.member.response.MemberInstanceGetResponse;
 import org.dows.member.service.MemberInstanceService;
 import org.springframework.stereotype.Component;
 
+import java.util.Date;
+import java.util.List;
 import java.util.Objects;
 
 @Component
@@ -18,17 +20,6 @@ import java.util.Objects;
 public class UserMemberInstanceHandlerImpl implements UserMemberInstanceHandler {
 
     protected final MemberInstanceService memberInstanceService;
-
-    @Override
-    public MemberInstanceGetResponse getByMemberInstanceIdAndAppId(Long memberInstanceId, String appId) {
-        MemberInstanceEntity entity = memberInstanceService.getOne(QueryWrapper.create()
-                .eq(MemberInstanceEntity::getMemberInstanceId, memberInstanceId)
-                .eq(MemberInstanceEntity::getAppId, appId));
-
-        isExist(entity);
-
-        return BeanUtil.copyProperties(entity, MemberInstanceGetResponse.class);
-    }
 
     @Override
     public MemberInstanceGetResponse getByAccountInstanceIdAndAppId(Long accountInstanceId, String appId) {
@@ -39,6 +30,14 @@ public class UserMemberInstanceHandlerImpl implements UserMemberInstanceHandler 
         isExist(entity);
 
         return BeanUtil.copyProperties(entity, MemberInstanceGetResponse.class);
+    }
+
+    @Override
+    public List<MemberInstanceGetResponse> listDueMemberInstance() {
+        List<MemberInstanceEntity> entities = memberInstanceService.list(QueryWrapper.create()
+                .le(MemberInstanceEntity::getExpiryDate, new Date()));
+
+        return BeanUtil.copyToList(entities, MemberInstanceGetResponse.class);
     }
 
     private void isExist(MemberInstanceEntity entity) {

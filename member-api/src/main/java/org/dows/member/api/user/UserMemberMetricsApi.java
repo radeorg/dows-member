@@ -9,9 +9,6 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/v1/user/member/metrics")
 public interface UserMemberMetricsApi {
 
-    @Operation(summary = "每日新增一条会员度量信息")
-    Long dailySave(@RequestParam("accountInstanceId") Long accountInstanceId);
-
     @Operation(summary = "已使用每日匹配次数加一")
     Boolean addUsedDailyMatchCount(Long accountInstanceId);
 
@@ -24,7 +21,7 @@ public interface UserMemberMetricsApi {
     @Operation(summary = "已创建JD次数加一")
     Boolean addUsedCreationJdCount(Long accountInstanceId);
 
-    @GetMapping("/newest/getByAccountId")
-    @Operation(summary = "根据账号ID获取最新一条会员度量详情")
-    MemberMetricsGetResponse getNewestByAccountInstanceId(@RequestParam("accountInstanceId") Long accountInstanceId);
+    @GetMapping("/get/newest")
+    @Operation(summary = "获取当前登录用户最新一条会员度量详情")
+    MemberMetricsGetResponse getNewest();
 }

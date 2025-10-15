@@ -2,9 +2,11 @@ package org.dows.member.handler.user;
 
 import org.dows.member.response.MemberInstanceGetResponse;
 
+import java.util.List;
+
 public interface UserMemberInstanceHandler {
 
-    MemberInstanceGetResponse getByMemberInstanceIdAndAppId(Long memberInstanceId, String appId);
-
     MemberInstanceGetResponse getByAccountInstanceIdAndAppId(Long accountInstanceId, String appId);
+
+    List<MemberInstanceGetResponse> listDueMemberInstance();
 }

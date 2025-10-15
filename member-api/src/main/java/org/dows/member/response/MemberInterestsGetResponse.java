@@ -2,6 +2,7 @@ package org.dows.member.response;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
+import org.dows.member.enums.MemberInterestsUsedDateEnum;
 
 import java.util.Date;
 
@@ -53,4 +54,10 @@ public class MemberInterestsGetResponse {
 
     @Schema(description = "最后更新时间")
     private Date ut;
+
+    private String usedDateStr;
+
+    public String getUsedDateStr(){
+        return MemberInterestsUsedDateEnum.getDescByCode(getUseDate());
+    }
 }

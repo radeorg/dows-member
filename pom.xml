@@ -27,6 +27,7 @@
     <module>member-rpc</module>
     <module>member-app</module>
     <module>member-boot</module>
+    <module>member-config</module>
     <module>member-core</module>
     <module>member-rest</module>
     <module>member-biz</module>
@@ -53,6 +54,11 @@
       </dependency>
       <dependency>
         <artifactId>member-boot</artifactId>
+        <groupId>org.dows.cloud</groupId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <artifactId>member-config</artifactId>
         <groupId>org.dows.cloud</groupId>
         <version>${project.version}</version>
       </dependency>

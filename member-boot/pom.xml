@@ -15,5 +15,9 @@
       <groupId>org.dows.cloud</groupId>
       <artifactId>member-rest</artifactId>
     </dependency>
+    <dependency>
+      <groupId>org.dows.cloud</groupId>
+      <artifactId>member-config</artifactId>
+    </dependency>
   </dependencies>
 </project>

@@ -1,13 +1,15 @@
 package org.dows.member.handler.user;
 
+import org.dows.member.entity.MemberInstanceEntity;
+import org.dows.member.entity.MemberInterestsEntity;
 import org.dows.member.response.MemberMetricsGetResponse;
 
 public interface UserMemberMetricsHandler {
 
     /**
-     * 线程执行：每日新增一条会员度量数据
+     * 新增或更新会员度量数据
      */
-    Long dailySave(Long accountInstanceId);
+    void saveOrUpdate(MemberInstanceEntity instance, MemberInterestsEntity interests);
 
     /**
      * 已使用每日匹配次数加一

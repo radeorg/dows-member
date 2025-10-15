@@ -5,26 +5,26 @@ import lombok.Getter;
 import java.util.Objects;
 
 /**
- * 会员变更类型枚举
+ * 会员使用时间段枚举
  */
 @Getter
-public enum MemberChangeTypeEnum {
+public enum MemberInterestsUsedDateEnum {
 
-    REGISTER("REGISTER", "会员注册"),
-    UP_GRADE("UP_GRADE", "会员升级"),
-    RENEWAL("RENEWAL", "会员续费"),
-    DUE("DUE", "会员到期");
+    TUE_FRI("TUE,FRI", "周二、周五"),
+    MON_FRI("MON-FRI", "周一至周五"),
+    MON_SUN("MON-SUN", "周一至周日"),
+    DAILY("DAILY", "每天");
 
     private final String code;
     private final String description;
 
-    MemberChangeTypeEnum(String code, String description) {
+    MemberInterestsUsedDateEnum(String code, String description) {
         this.code = code;
         this.description = description;
     }
 
-    public static MemberChangeTypeEnum getByCode(String code, boolean throwException) {
-        for (MemberChangeTypeEnum type : MemberChangeTypeEnum.values()) {
+    public static MemberInterestsUsedDateEnum getByCode(String code, boolean throwException) {
+        for (MemberInterestsUsedDateEnum type : MemberInterestsUsedDateEnum.values()) {
             if (Objects.equals(type.getCode(), code)) {
                 return type;
             }
@@ -36,7 +36,7 @@ public enum MemberChangeTypeEnum {
     }
 
     public static String getDescByCode(String code) {
-        for (MemberChangeTypeEnum type : MemberChangeTypeEnum.values()) {
+        for (MemberInterestsUsedDateEnum type : MemberInterestsUsedDateEnum.values()) {
             if (Objects.equals(type.getCode(), code)) {
                 return type.getDescription();
             }
