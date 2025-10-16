@@ -33,6 +33,9 @@ public class UserMemberMetricsHandlerImpl implements UserMemberMetricsHandler {
         entity.setActiveInterviewCount(interests.getActiveInterviewCount());
         entity.setCreationJdCount(interests.getCreationJdCount());
         entity.setSingleUploadCount(interests.getSingleUploadCount());
+        entity.setEmailPushEnabled(interests.getEmailPushEnabled());
+        entity.setUseDate(interests.getUseDate());
+        entity.setHolidayExclude(interests.getHolidayExclude());
 
         // 查询最新一条会员度量数据
         MemberMetricsEntity metrics = getNewestByAccountInstanceId(instance.getAccountInstanceId());
@@ -52,22 +55,24 @@ public class UserMemberMetricsHandlerImpl implements UserMemberMetricsHandler {
                 metrics.setDailyMatchCount(interests.getDailyMatchCount());
                 metrics.setSingleUploadCount(interests.getSingleUploadCount());
                 metrics.setCreationJdCount(interests.getCreationJdCount());
+                metrics.setEmailPushEnabled(interests.getEmailPushEnabled());
+                metrics.setUseDate(interests.getUseDate());
+                metrics.setHolidayExclude(interests.getHolidayExclude());
 
-                memberMetricsService.updateById(entity);
+                memberMetricsService.updateById(metrics);
             }
         }
     }
 
     @Override
-    public Boolean addUsedDailyMatchCount(Long accountInstanceId) {
+    public Boolean addUsedDailyMatchCount(Long accountInstanceId, int matchNum) {
         MemberMetricsEntity entity = getNewestByAccountInstanceId(accountInstanceId);
 
         isExist(entity);
 
-        if (Objects.equals(entity.getDailyMatchCount(), entity.getUsedMatchCount())) {
-            throw new MemberException(MemberExceptionStatusCode.METRICS_MATCH_OVER_LIMIT);
-        }
-        entity.setUsedMatchCount(entity.getUsedMatchCount() + 1);
+        validateMatch(entity, matchNum);
+
+        entity.setUsedMatchCount(entity.getUsedMatchCount() + matchNum);
 
         return memberMetricsService.updateById(entity);
     }
@@ -78,9 +83,8 @@ public class UserMemberMetricsHandlerImpl implements UserMemberMetricsHandler {
 
         isExist(entity);
 
-        if (Objects.equals(entity.getActiveInterviewCount(), entity.getUsedInterviewCount())) {
-            throw new MemberException(MemberExceptionStatusCode.METRICS_ACTIVE_INVITE_OVER_LIMIT);
-        }
+        validateInterview(entity);
+
         entity.setUsedInterviewCount(entity.getUsedInterviewCount() + 1);
 
         return memberMetricsService.updateById(entity);
@@ -106,9 +110,8 @@ public class UserMemberMetricsHandlerImpl implements UserMemberMetricsHandler {
 
         isExist(entity);
 
-        if (Objects.equals(entity.getCreationJdCount(), entity.getUsedCreationJdCount())) {
-            throw new MemberException(MemberExceptionStatusCode.METRICS_CREATION_JD_OVER_LIMIT);
-        }
+        validateCreateJd(entity);
+
         entity.setUsedCreationJdCount(entity.getUsedCreationJdCount() + 1);
 
         return memberMetricsService.updateById(entity);
@@ -124,6 +127,77 @@ public class UserMemberMetricsHandlerImpl implements UserMemberMetricsHandler {
         isExist(entity);
 
         return BeanUtil.copyProperties(entity, MemberMetricsGetResponse.class);
+    }
+
+    @Override
+    public void validateUploadPermission(Long accountInstanceId, int uploadCount) {
+        MemberMetricsEntity entity = getNewestByAccountInstanceId(accountInstanceId);
+
+        isExist(entity);
+
+        if (entity.getSingleUploadCount() < uploadCount) {
+            throw new MemberException("当前最多可上传 " + entity.getSingleUploadCount() + " 份简历");
+        }
+    }
+
+    @Override
+    public void validateMatchJdPermission(Long accountInstanceId, int matchNum) {
+        MemberMetricsEntity entity = getNewestByAccountInstanceId(accountInstanceId);
+
+        isExist(entity);
+
+        validateMatch(entity, matchNum);
+    }
+
+    @Override
+    public void validateCreationJdPermission(Long accountInstanceId) {
+        MemberMetricsEntity entity = getNewestByAccountInstanceId(accountInstanceId);
+
+        isExist(entity);
+
+        validateCreateJd(entity);
+    }
+
+    @Override
+    public void validateInterviewPermission(Long accountInstanceId) {
+        MemberMetricsEntity entity = getNewestByAccountInstanceId(accountInstanceId);
+
+        isExist(entity);
+
+        validateInterview(entity);
+    }
+
+    @Override
+    public void validatePushEmailPermission(Long accountInstanceId) {
+        MemberMetricsEntity entity = getNewestByAccountInstanceId(accountInstanceId);
+
+        isExist(entity);
+
+        if (entity.getEmailPushEnabled() == 0) {
+            throw new MemberException("邮件推送功能为 [具备该功能的会员等级，如白银及以上] 会员专属");
+        }
+    }
+
+    private void validateMatch(MemberMetricsEntity entity, int matchNum){
+        int usedNum = entity.getUsedMatchCount() + matchNum;
+        int remain = entity.getDailyMatchCount() - entity.getUsedMatchCount();
+        if (entity.getUsedMatchCount() >= entity.getDailyMatchCount()) {
+            throw new MemberException("今日匹配次数已用完。会员每日可匹配 " + entity.getDailyMatchCount() + " 次");
+        } else if (usedNum > entity.getDailyMatchCount()) {
+            throw new MemberException("已使用匹配次数 " + entity.getUsedMatchCount() + " ，当前剩余可匹配 " + remain + " 次");
+        }
+    }
+
+    private void validateCreateJd(MemberMetricsEntity entity){
+        if (entity.getUsedCreationJdCount() >= entity.getCreationJdCount()) {
+            throw new MemberException("当前会员最多可创建 " + entity.getCreationJdCount() + " 个职位描述");
+        }
+    }
+
+    private void validateInterview(MemberMetricsEntity entity) {
+        if (entity.getUsedInterviewCount() >= entity.getActiveInterviewCount()) {
+            throw new MemberException("当前最多可同时进行 " + entity.getActiveInterviewCount() + " 个邀约");
+        }
     }
 
     private MemberMetricsEntity getNewestByAccountInstanceId(Long accountInstanceId) {

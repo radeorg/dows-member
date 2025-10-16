@@ -22,28 +22,53 @@ public class UserMemberMetricsRest implements UserMemberMetricsApi {
     private final AacContext aacContext;
 
     @Override
-    public Boolean addUsedDailyMatchCount(Long accountInstanceId) {
-        return userMemberMetricsHandler.addUsedDailyMatchCount(accountInstanceId);
+    public void addUsedDailyMatchCount(int matchNum) {
+        userMemberMetricsHandler.addUsedDailyMatchCount(getAccountId(), matchNum);
     }
 
     @Override
-    public Boolean addUsedActiveInviteCount(Long accountInstanceId) {
-        return userMemberMetricsHandler.addUsedActiveInviteCount(accountInstanceId);
+    public void addUsedActiveInviteCount() {
+        userMemberMetricsHandler.addUsedActiveInviteCount(getAccountId());
     }
 
     @Override
-    public Boolean subUsedActiveInviteCount(Long accountInstanceId) {
-        return userMemberMetricsHandler.subUsedActiveInviteCount(accountInstanceId);
+    public void subUsedActiveInviteCount() {
+        userMemberMetricsHandler.subUsedActiveInviteCount(getAccountId());
     }
 
     @Override
-    public Boolean addUsedCreationJdCount(Long accountInstanceId) {
-        return userMemberMetricsHandler.addUsedCreationJdCount(accountInstanceId);
+    public void addUsedCreationJdCount() {
+        userMemberMetricsHandler.addUsedCreationJdCount(getAccountId());
     }
 
     @Override
     public MemberMetricsGetResponse getNewest() {
         return userMemberMetricsHandler.getNewest(getAccountId(), AppContext.getAppId());
+    }
+
+    @Override
+    public void validateUploadPermission(int uploadNum) {
+        userMemberMetricsHandler.validateUploadPermission(getAccountId(), uploadNum);
+    }
+
+    @Override
+    public void validateMatchJdPermission(int matchNum) {
+        userMemberMetricsHandler.validateMatchJdPermission(getAccountId(), matchNum);
+    }
+
+    @Override
+    public void validateCreationJdPermission() {
+        userMemberMetricsHandler.validateCreationJdPermission(getAccountId());
+    }
+
+    @Override
+    public void validateInterviewPermission() {
+        userMemberMetricsHandler.validateInterviewPermission(getAccountId());
+    }
+
+    @Override
+    public void validatePushEmailPermission() {
+        userMemberMetricsHandler.validatePushEmailPermission(getAccountId());
     }
 
     private Long getAccountId() {

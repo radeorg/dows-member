@@ -9,19 +9,34 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/v1/user/member/metrics")
 public interface UserMemberMetricsApi {
 
-    @Operation(summary = "已使用每日匹配次数加一")
-    Boolean addUsedDailyMatchCount(Long accountInstanceId);
-
-    @Operation(summary = "已使用同时面试邀约次数加一")
-    Boolean addUsedActiveInviteCount(Long accountInstanceId);
-
-    @Operation(summary = "已使用同时面试邀约次数减一")
-    Boolean subUsedActiveInviteCount(Long accountInstanceId);
-
-    @Operation(summary = "已创建JD次数加一")
-    Boolean addUsedCreationJdCount(Long accountInstanceId);
-
     @GetMapping("/get/newest")
     @Operation(summary = "获取当前登录用户最新一条会员度量详情")
     MemberMetricsGetResponse getNewest();
+
+    @Operation(summary = "增加已使用每日匹配次数")
+    void addUsedDailyMatchCount(int matchNum);
+
+    @Operation(summary = "已使用同时面试邀约次数加一")
+    void addUsedActiveInviteCount();
+
+    @Operation(summary = "已使用同时面试邀约次数减一")
+    void subUsedActiveInviteCount();
+
+    @Operation(summary = "已创建JD次数加一")
+    void addUsedCreationJdCount();
+
+    @Operation(summary = "简历上传权限校验")
+    void validateUploadPermission(int uploadNum);
+
+    @Operation(summary = "人岗匹配权限校验")
+    void validateMatchJdPermission(int matchNum);
+
+    @Operation(summary = "创建JD权限校验")
+    void validateCreationJdPermission();
+
+    @Operation(summary = "面试邀约权限校验")
+    void validateInterviewPermission();
+
+    @Operation(summary = "推送邮箱权限校验")
+    void validatePushEmailPermission();
 }

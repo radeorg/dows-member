@@ -42,6 +42,15 @@ public class MemberMetricsGetResponse {
     @Schema(description = "单次上传简历上限")
     private Integer singleUploadCount;
 
+    @Schema(description = "邮件推送功能开关")
+    private Integer emailPushEnabled;
+
+    @Schema(description = "使用时间段")
+    private String useDate;
+
+    @Schema(description = "是否排除节假日")
+    private Integer holidayExclude;
+
     @Schema(description = "appId")
     private String appId;
 

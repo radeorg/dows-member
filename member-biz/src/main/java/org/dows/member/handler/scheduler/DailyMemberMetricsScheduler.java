@@ -32,7 +32,7 @@ public class DailyMemberMetricsScheduler {
     private final ThreadPoolTaskExecutor dailyMemberMetricsTaskExecutor;
 
     // 每天00:00:00执行（CRON表达式）
-    @Scheduled(cron = "0 */1 * * * ?")
+    @Scheduled(cron = "0 0 0 * * ?")
     public void dailyTask() {
         try {
             int currentPage = 1; // 重置页码为1，确保每次定时任务都从第一页开始处理
@@ -55,7 +55,7 @@ public class DailyMemberMetricsScheduler {
                 currentPage++;
             }
         } catch (Exception e) {
-            log.error("简历解析调度异常", e);
+            log.error("生成每日会员度量数据调度异常", e);
         }
     }
     private AdminMemberInstanceQueryRequest buildRequest() {
@@ -75,7 +75,7 @@ public class DailyMemberMetricsScheduler {
                         userMemberMetricsBiz.saveDailyMemberMetrics(tempRecord.getMemberInstanceId());
                     }
                 } catch (Exception e) {
-                    log.error("处理简历文件数字化异常", e);
+                    log.error("生成每日会员度量数据异常", e);
                 }finally {
                     latch.countDown();
                 }

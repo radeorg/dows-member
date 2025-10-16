@@ -131,7 +131,7 @@ public class UserMemberInstanceBizImpl implements UserMemberInstanceBiz {
 
     @Transactional
     @Override
-    public Boolean due(Long memberInstanceId) {
+    public void due(Long memberInstanceId) {
         // 查询会员实例
         MemberInstanceEntity oldInstance = getMemberInstanceById(memberInstanceId);
 
@@ -155,8 +155,6 @@ public class UserMemberInstanceBizImpl implements UserMemberInstanceBiz {
             // 更新或新增会员度量表
             userMemberMetricsHandler.saveOrUpdate(oldInstance, interests);
         }
-
-        return true;
     }
 
     private MemberInstanceEntity saveMemberInstance(UserMemberInstanceSaveRequest request, MemberInterestsEntity interests){

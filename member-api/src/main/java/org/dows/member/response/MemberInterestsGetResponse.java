@@ -55,9 +55,9 @@ public class MemberInterestsGetResponse {
     @Schema(description = "最后更新时间")
     private Date ut;
 
-    private String usedDateStr;
+    private String useDateStr;
 
-    public String getUsedDateStr(){
+    public String getUseDateStr(){
         return MemberInterestsUsedDateEnum.getDescByCode(getUseDate());
     }
 }

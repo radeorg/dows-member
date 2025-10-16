@@ -52,6 +52,15 @@ public class MemberMetricsEntity extends BaseEntity<MemberMetricsEntity> {
     @Column(value = "single_upload_count", comment = "单次上传简历上限")
     private Integer singleUploadCount;
 
+    @Column(value = "email_push_enabled", comment = "邮件推送功能开关，0关闭，1打开")
+    private Integer emailPushEnabled;
+
+    @Column(value = "use_date", comment = "使用时间段")
+    private String useDate;
+
+    @Column(value = "holiday_exclude", comment = "是否排除节假日")
+    private Integer holidayExclude;
+
     @Column(value = "app_id", comment = "应用ID")
     private String appId;
 

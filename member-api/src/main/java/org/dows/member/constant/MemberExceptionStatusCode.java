@@ -13,10 +13,7 @@ public enum MemberExceptionStatusCode implements StatusCode {
     MEMBER_INSTANCE_NOT_FOUND("MEMBER002001", "会员实例不存在"),
     MEMBER_INSTANCE_EXIST("MEMBER002002", "会员实例已存在"),
     METRICS_NOT_FOUND("MEMBER003001", "会员度量不存在"),
-    METRICS_MATCH_OVER_LIMIT("MEMBER003002", "今日匹配次数已用完"),
-    METRICS_ACTIVE_INVITE_OVER_LIMIT("MEMBER003003", "同时邀约次数已用完"),
-    METRICS_ACTIVE_INVITE_LOWER_LIMIT("MEMBER003004", "同时邀约次数已达下限"),
-    METRICS_CREATION_JD_OVER_LIMIT("MEMBER003005", "创建JD次数已用完");
+    METRICS_ACTIVE_INVITE_LOWER_LIMIT("MEMBER003004", "同时邀约次数已达下限");
 
     private final String code;
     private final String describe;

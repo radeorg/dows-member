@@ -51,10 +51,11 @@ public class UserMemberInstanceRest implements UserMemberInstanceApi {
         return userMemberInstanceBiz.renewal(request);
     }
 
-    @Override
-    public Boolean due(Long memberInstanceId) {
-        return userMemberInstanceBiz.due(memberInstanceId);
-    }
+//    @Override
+//    public Boolean due(Long memberInstanceId) {
+//        userMemberInstanceBiz.due(memberInstanceId);
+//        return true;
+//    }
 
     @Override
     public MemberInstanceGetResponse get() {
