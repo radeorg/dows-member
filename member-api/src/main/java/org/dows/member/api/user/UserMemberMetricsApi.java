@@ -19,8 +19,11 @@ public interface UserMemberMetricsApi {
     @Operation(summary = "已使用同时面试邀约次数加一")
     void addUsedActiveInviteCount();
 
-    @Operation(summary = "已使用同时面试邀约次数减一")
-    void subUsedActiveInviteCount();
+    @Operation(summary = "用户主动放弃面试：已使用同时面试邀约次数减一")
+    void subUsedActiveInviteCountByGiveUp();
+
+    @Operation(summary = "招聘结束（含通过、不通过、弃用）：已使用同时面试邀约次数减一")
+    void subUsedActiveInviteCount(Long accountInstanceId);
 
     @Operation(summary = "已创建JD次数加一")
     void addUsedCreationJdCount();

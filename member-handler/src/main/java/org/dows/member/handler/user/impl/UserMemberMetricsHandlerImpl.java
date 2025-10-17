@@ -65,7 +65,7 @@ public class UserMemberMetricsHandlerImpl implements UserMemberMetricsHandler {
     }
 
     @Override
-    public Boolean addUsedDailyMatchCount(Long accountInstanceId, int matchNum) {
+    public void addUsedDailyMatchCount(Long accountInstanceId, int matchNum) {
         MemberMetricsEntity entity = getNewestByAccountInstanceId(accountInstanceId);
 
         isExist(entity);
@@ -74,11 +74,11 @@ public class UserMemberMetricsHandlerImpl implements UserMemberMetricsHandler {
 
         entity.setUsedMatchCount(entity.getUsedMatchCount() + matchNum);
 
-        return memberMetricsService.updateById(entity);
+        memberMetricsService.updateById(entity);
     }
 
     @Override
-    public Boolean addUsedActiveInviteCount(Long accountInstanceId) {
+    public void addUsedActiveInviteCount(Long accountInstanceId) {
         MemberMetricsEntity entity = getNewestByAccountInstanceId(accountInstanceId);
 
         isExist(entity);
@@ -87,11 +87,11 @@ public class UserMemberMetricsHandlerImpl implements UserMemberMetricsHandler {
 
         entity.setUsedInterviewCount(entity.getUsedInterviewCount() + 1);
 
-        return memberMetricsService.updateById(entity);
+        memberMetricsService.updateById(entity);
     }
 
     @Override
-    public Boolean subUsedActiveInviteCount(Long accountInstanceId) {
+    public void subUsedActiveInviteCount(Long accountInstanceId) {
         MemberMetricsEntity entity = getNewestByAccountInstanceId(accountInstanceId);
 
         isExist(entity);
@@ -101,11 +101,11 @@ public class UserMemberMetricsHandlerImpl implements UserMemberMetricsHandler {
         }
         entity.setUsedInterviewCount(entity.getUsedInterviewCount() - 1);
 
-        return memberMetricsService.updateById(entity);
+        memberMetricsService.updateById(entity);
     }
 
     @Override
-    public Boolean addUsedCreationJdCount(Long accountInstanceId) {
+    public void addUsedCreationJdCount(Long accountInstanceId) {
         MemberMetricsEntity entity = getNewestByAccountInstanceId(accountInstanceId);
 
         isExist(entity);
@@ -114,7 +114,7 @@ public class UserMemberMetricsHandlerImpl implements UserMemberMetricsHandler {
 
         entity.setUsedCreationJdCount(entity.getUsedCreationJdCount() + 1);
 
-        return memberMetricsService.updateById(entity);
+        memberMetricsService.updateById(entity);
     }
 
     @Override

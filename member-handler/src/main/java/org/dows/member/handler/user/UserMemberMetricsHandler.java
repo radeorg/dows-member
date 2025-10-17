@@ -15,22 +15,22 @@ public interface UserMemberMetricsHandler {
      * 增加已使用每日匹配次数
      * @param matchNum 当前匹配个数
      */
-    Boolean addUsedDailyMatchCount(Long accountInstanceId, int matchNum);
+    void addUsedDailyMatchCount(Long accountInstanceId, int matchNum);
 
     /**
      * 已使用同时面试邀约次数加一
      */
-    Boolean addUsedActiveInviteCount(Long accountInstanceId);
+    void addUsedActiveInviteCount(Long accountInstanceId);
 
     /**
      * 已使用同时面试邀约次数减一
      */
-    Boolean subUsedActiveInviteCount(Long accountInstanceId);
+    void subUsedActiveInviteCount(Long accountInstanceId);
 
     /**
      * 已创建JD次数加一
      */
-    Boolean addUsedCreationJdCount(Long accountInstanceId);
+    void addUsedCreationJdCount(Long accountInstanceId);
 
     /**
      * 获取账号最新一条会员度量数据
