@@ -21,6 +21,12 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-websocket</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.github.wechatpay-apiv3</groupId>
+            <artifactId>wechatpay-java</artifactId>
+            <version>0.2.15</version>
+            <scope>compile</scope>
+        </dependency>
     </dependencies>
 
     <build>
@@ -32,6 +38,7 @@
                     <include>**/*.properties</include>
                     <include>**/*.xml</include>
                     <include>**/*.sql</include>
+                    <include>**/cert/*.pem</include>
                 </includes>
                 <filtering>true</filtering>
             </resource>
@@ -42,6 +49,7 @@
                     <include>**/*.properties</include>
                     <include>**/*.xml</include>
                     <include>**/*.sql</include>
+                    <include>**/cert/*.pem</include>
                 </includes>
                 <filtering>true</filtering>
             </resource>
