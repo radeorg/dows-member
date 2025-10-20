@@ -14,4 +14,5 @@ public interface WechatPayBiz {
     Map<String, String> wechatPayNotify(HttpServletRequest request);
 
     WechatPayStatusResponse wechatPayStatus(String outTradeNo);
+
 }

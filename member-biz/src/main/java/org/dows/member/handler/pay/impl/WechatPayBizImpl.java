@@ -24,6 +24,7 @@ import org.dows.member.handler.user.UserMemberInstanceBiz;
 import org.dows.member.request.pay.WechatPayQrCodeRequest;
 import org.dows.member.response.pay.PayQrCodeResponse;
 import org.dows.member.response.pay.WechatPayStatusResponse;
+import org.dows.member.handler.pay.WechatPayBiz;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
@@ -153,6 +154,7 @@ public class WechatPayBizImpl implements WechatPayBiz {
             System.out.println("支付成功，微信订单号：" + transaction.getTransactionId());
             wechatPayStatusResponse.setSuccessTime(transaction.getSuccessTime());
             // 4. 更新本地订单状态
+public class WechatPayBizImpl implements WechatPayBiz {
 
         } else {
             // 支付未成功，根据状态做进一步处理
