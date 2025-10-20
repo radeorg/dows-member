@@ -7,8 +7,6 @@ import org.dows.member.exception.MemberException;
 import org.dows.member.handler.user.UserMemberInstanceBiz;
 import org.dows.member.handler.user.UserMemberInstanceHandler;
 import org.dows.member.request.user.UserMemberInstanceSaveRequest;
-import org.dows.member.request.user.UserMemberInstanceRenewalRequest;
-import org.dows.member.request.user.UserMemberInstanceUpGradeRequest;
 import org.dows.member.response.MemberInstanceGetResponse;
 import org.dows.rade.aac.AacContext;
 import org.dows.rade.aac.AacUser;
@@ -29,26 +27,6 @@ public class UserMemberInstanceRest implements UserMemberInstanceApi {
     @Override
     public Long save(UserMemberInstanceSaveRequest request) {
         return userMemberInstanceBiz.save(request);
-    }
-
-    @Override
-    public Boolean upgrade(Long memberInterestsId) {
-        UserMemberInstanceUpGradeRequest request = new UserMemberInstanceUpGradeRequest();
-        request.setAppId(AppContext.getAppId());
-        request.setAccountInstanceId(getAccountId());
-        request.setMemberInterestsId(memberInterestsId);
-
-        return userMemberInstanceBiz.upgrade(request);
-    }
-
-    @Override
-    public Boolean renewal(Long memberInterestsId) {
-        UserMemberInstanceRenewalRequest request = new UserMemberInstanceRenewalRequest();
-        request.setAppId(AppContext.getAppId());
-        request.setAccountInstanceId(getAccountId());
-        request.setMemberInterestsId(memberInterestsId);
-
-        return userMemberInstanceBiz.renewal(request);
     }
 
 //    @Override

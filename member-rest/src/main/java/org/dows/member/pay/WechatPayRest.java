@@ -4,10 +4,11 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.dows.member.api.pay.WechatPayApi;
-import org.dows.member.handler.pay.WechatPayHandler;
-import org.dows.member.request.pay.WechatPayQrCodeRequest;
-import org.dows.member.response.WechatPayQrCodeResponse;
-import org.dows.member.response.WechatPayStatusResponse;
+import org.dows.member.handler.pay.PaymentBiz;
+import org.dows.member.handler.pay.WechatPayBiz;
+import org.dows.member.request.pay.CreateNativePayQrCodeRequest;
+import org.dows.member.response.pay.PayQrCodeResponse;
+import org.dows.member.response.pay.WechatPayStatusResponse;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Map;
@@ -16,21 +17,22 @@ import java.util.Map;
 @Tag(name = "微信支付", description = "微信支付")
 @RequiredArgsConstructor
 public class WechatPayRest implements WechatPayApi {
-    private final WechatPayHandler wechatPayHandler;
+
+    private final PaymentBiz paymentBiz;
+    private final WechatPayBiz wechatPayBiz;
 
     @Override
-    public WechatPayQrCodeResponse wechatPayQrCode(WechatPayQrCodeRequest request) {
-        return wechatPayHandler.wechatPayQrCode(request.getOutTradeNo(), request.getTotalAmount(), request.getDescription());
+    public PayQrCodeResponse wechatPayQrCode(CreateNativePayQrCodeRequest request) {
+        return paymentBiz.createNativePayment(request);
     }
 
     @Override
-    public String wechatPayNotify(HttpServletRequest request) {
-        return wechatPayHandler.wechatPayNotify(request);
+    public Map<String, String> wechatPayNotify(HttpServletRequest request) {
+        return wechatPayBiz.wechatPayNotify(request);
     }
 
     @Override
     public WechatPayStatusResponse wechatPayStatus(String outTradeNo) {
-        return wechatPayHandler.wechatPayStatus(outTradeNo);
+        return null;
     }
-
 }

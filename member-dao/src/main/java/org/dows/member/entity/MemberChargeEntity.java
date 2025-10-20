@@ -26,6 +26,12 @@ public class MemberChargeEntity extends BaseEntity<MemberChargeEntity> {
     @Column(value = "account_instance_id", comment = "账号实例ID")
     private Long accountInstanceId;
 
+    @Column(value = "member_instance_id", comment = "会员实例ID")
+    private Long memberInstanceId;
+
+    @Column(value = "member_interests_id", comment = "会员权益ID")
+    private Long memberInterestsId;
+
     @Column(value = "pay_no", comment = "支付单号")
     private String payNo;
 
@@ -36,13 +42,19 @@ public class MemberChargeEntity extends BaseEntity<MemberChargeEntity> {
     private String channel;
 
     @Column(value = "state", comment = "充值状态(0:pending,1:completed,2:failed,3:refunded)")
-    private Integer state;
+    private String state;
 
     @Column(value = "charge_time", comment = "实际充值时间")
     private Date chargeTime;
 
     @Column(value = "transaction_id", comment = "第三方支付交易号")
     private String transactionId;
+
+    @Column(value = "charge_type", comment = "充值类型")
+    private String chargeType;
+
+    @Column(value = "note", comment = "充值备注")
+    private String note;
 
     @Column(value = "app_id", comment = "应用ID")
     private String appId;

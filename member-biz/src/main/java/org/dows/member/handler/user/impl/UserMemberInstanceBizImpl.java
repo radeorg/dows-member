@@ -3,6 +3,7 @@ package org.dows.member.handler.user.impl;
 import com.mybatisflex.core.query.QueryWrapper;
 import lombok.RequiredArgsConstructor;
 import org.dows.member.constant.MemberExceptionStatusCode;
+import org.dows.member.entity.MemberChargeEntity;
 import org.dows.member.entity.MemberInstanceEntity;
 import org.dows.member.entity.MemberInterestsEntity;
 import org.dows.member.enums.MemberChangeTypeEnum;
@@ -11,9 +12,8 @@ import org.dows.member.exception.MemberException;
 import org.dows.member.handler.user.UserMemberChangeHandler;
 import org.dows.member.handler.user.UserMemberInstanceBiz;
 import org.dows.member.handler.user.UserMemberMetricsHandler;
-import org.dows.member.request.user.UserMemberInstanceRenewalRequest;
 import org.dows.member.request.user.UserMemberInstanceSaveRequest;
-import org.dows.member.request.user.UserMemberInstanceUpGradeRequest;
+import org.dows.member.service.MemberChargeService;
 import org.dows.member.service.MemberInstanceService;
 import org.dows.member.service.MemberInterestsService;
 import org.springframework.stereotype.Component;
@@ -31,6 +31,7 @@ public class UserMemberInstanceBizImpl implements UserMemberInstanceBiz {
     private final MemberInterestsService memberInterestsService;
     private final UserMemberMetricsHandler userMemberMetricsHandler;
     private final UserMemberChangeHandler userMemberChangeHandler;
+    private final MemberChargeService memberChargeService;
 
     @Transactional
     @Override
@@ -61,26 +62,24 @@ public class UserMemberInstanceBizImpl implements UserMemberInstanceBiz {
 
     @Transactional
     @Override
-    public Boolean upgrade(UserMemberInstanceUpGradeRequest request) {
+    public void upgrade(MemberChargeEntity memberCharge) {
         // 查询会员实例
         MemberInstanceEntity oldInstance = getMemberInterestsByAccountInstanceIdAndAppId(
-                request.getAccountInstanceId(),
-                request.getAppId()
+                memberCharge.getAccountInstanceId(),
+                memberCharge.getAppId()
         );
 
         // 校验会员实例是否存在
         isMemberInstanceExist(oldInstance);
 
-        // 校验升级的等级跟当前等级是否一致
-        if (oldInstance.getMemberInterestsId().equals(request.getMemberInterestsId())) {
-            throw new MemberException("当前已是【" + MemberTypeEnum.getDescByCode(oldInstance.getMemberType()) + "】，不可重复操作");
-        }
-
         // 查询当前缴费的会员等级，并验证是否存在及状态是否正常
-        MemberInterestsEntity interests = getMemberInterestsById(request.getMemberInterestsId());
+        MemberInterestsEntity interests = getMemberInterestsById(memberCharge.getMemberInterestsId());
 
         // 更新会员等级信息
         MemberInstanceEntity newInstance = updateMemberInstance(oldInstance, interests);
+
+        // 更新充值状态
+        memberChargeService.updateById(memberCharge);
 
         // 新增会员变更记录表
         userMemberChangeHandler.save(oldInstance,
@@ -90,29 +89,22 @@ public class UserMemberInstanceBizImpl implements UserMemberInstanceBiz {
 
         // 更新或新增会员度量表
         userMemberMetricsHandler.saveOrUpdate(oldInstance, interests);
-
-        return true;
     }
 
     @Transactional
     @Override
-    public Boolean renewal(UserMemberInstanceRenewalRequest request) {
+    public void renewal(MemberChargeEntity memberCharge) {
         // 查询会员实例
         MemberInstanceEntity oldInstance = getMemberInterestsByAccountInstanceIdAndAppId(
-                request.getAccountInstanceId(),
-                request.getAppId()
+                memberCharge.getAccountInstanceId(),
+                memberCharge.getAppId()
         );
 
         // 校验会员实例是否存在
         isMemberInstanceExist(oldInstance);
 
         // 查询当前缴费的会员等级，并验证是否存在及状态是否正常
-        MemberInterestsEntity interests = getMemberInterestsById(request.getMemberInterestsId());
-
-        // 校验续费的等级跟当前等级是否一致
-        if (!oldInstance.getMemberInterestsId().equals(request.getMemberInterestsId())) {
-            throw new MemberException("当前不是【" + MemberTypeEnum.getDescByCode(interests.getMemberType()) + "】，不能进行续费操作");
-        }
+        MemberInterestsEntity interests = getMemberInterestsById(memberCharge.getMemberInterestsId());
 
         // 更新会员等级信息
         MemberInstanceEntity newInstance = updateMemberInstance(oldInstance, interests);
@@ -123,10 +115,11 @@ public class UserMemberInstanceBizImpl implements UserMemberInstanceBiz {
                 interests,
                 MemberChangeTypeEnum.RENEWAL.getCode());
 
+        // 更新充值状态
+        memberChargeService.updateById(memberCharge);
+
         // 更新或新增会员度量表
         userMemberMetricsHandler.saveOrUpdate(oldInstance, interests);
-
-        return true;
     }
 
     @Transactional

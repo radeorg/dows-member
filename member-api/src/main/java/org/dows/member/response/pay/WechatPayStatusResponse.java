@@ -1,8 +1,7 @@
-package org.dows.member.response;
+package org.dows.member.response.pay;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
-import org.apache.ibatis.transaction.Transaction;
 
 @Data
 @Schema(description = "微信支付订单状态查询请求")

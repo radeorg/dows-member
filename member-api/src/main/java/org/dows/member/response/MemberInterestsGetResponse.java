@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import org.dows.member.enums.MemberInterestsUsedDateEnum;
 
+import java.math.BigDecimal;
 import java.util.Date;
 
 @Data
@@ -17,7 +18,7 @@ public class MemberInterestsGetResponse {
     private String memberType;
 
     @Schema(description = "价格")
-    private Double amount;
+    private BigDecimal amount;
 
     @Schema(description = "会员有效期（为空代表永久）")
     private Integer expiryDay;

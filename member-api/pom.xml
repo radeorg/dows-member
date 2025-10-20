@@ -34,5 +34,11 @@
       <groupId>io.swagger.core.v3</groupId>
       <artifactId>swagger-core-jakarta</artifactId>
     </dependency>
+    <!-- 微信支付V3 SDK -->
+    <dependency>
+      <groupId>com.github.wechatpay-apiv3</groupId>
+      <artifactId>wechatpay-java</artifactId>
+      <version>0.2.15</version>
+    </dependency>
   </dependencies>
 </project>

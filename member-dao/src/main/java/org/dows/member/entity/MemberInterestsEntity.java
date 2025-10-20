@@ -11,6 +11,7 @@ import lombok.EqualsAndHashCode;
 import org.dows.rade.crud.AutoFillDataListener;
 import org.dows.rade.crud.BaseEntity;
 
+import java.math.BigDecimal;
 import java.util.Date;
 
 @EqualsAndHashCode(callSuper = true)
@@ -31,7 +32,7 @@ public class MemberInterestsEntity extends BaseEntity<MemberInterestsEntity> {
     private String memberType;
 
     @Column(value = "amount", comment = "会员价格")
-    private Double amount;
+    private BigDecimal amount;
 
     @Column(value = "expiry_day", comment = "会员有效期")
     private Integer expiryDay;

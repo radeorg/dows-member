@@ -1,8 +1,7 @@
 package org.dows.member.handler.user;
 
-import org.dows.member.request.user.UserMemberInstanceRenewalRequest;
+import org.dows.member.entity.MemberChargeEntity;
 import org.dows.member.request.user.UserMemberInstanceSaveRequest;
-import org.dows.member.request.user.UserMemberInstanceUpGradeRequest;
 
 public interface UserMemberInstanceBiz {
 
@@ -14,12 +13,12 @@ public interface UserMemberInstanceBiz {
     /**
      * 会员升级
      */
-    Boolean upgrade(UserMemberInstanceUpGradeRequest request);
+    void upgrade(MemberChargeEntity memberCharge);
 
     /**
      * 会员续费
      */
-    Boolean renewal(UserMemberInstanceRenewalRequest request);
+    void renewal(MemberChargeEntity memberCharge);
 
     /**
      * 每日线程执行：会员到期

@@ -17,4 +17,7 @@ public class WechatPayQrCodeRequest {
 
     @Schema(description = "描述")
     private  String description;
+
+    @Schema(description = "客户端IP")
+    private String clientIp;
 }

@@ -14,13 +14,6 @@ public interface UserMemberInstanceApi {
     @Operation(summary = "新增会员")
     Long save(@RequestBody UserMemberInstanceSaveRequest request);
 
-    @PostMapping("/upgrade")
-    @Operation(summary = "升级")
-    Boolean upgrade(@RequestParam("memberInterestsId") Long memberInterestsId);
-
-    @PostMapping("/renewal")
-    @Operation(summary = "续费")
-    Boolean renewal(@RequestParam("memberInterestsId") Long memberInterestsId);
 //
 //    @Operation(summary = "到期")
 //    @PostMapping("/due")

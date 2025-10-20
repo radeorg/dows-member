@@ -3,6 +3,8 @@ package org.dows.member.request.admin;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
+import java.math.BigDecimal;
+
 @Data
 @Schema(description = "修改会员权益请求")
 public class AdminMemberInterestsUpdateRequest {
@@ -14,7 +16,7 @@ public class AdminMemberInterestsUpdateRequest {
     private String memberType;
 
     @Schema(description = "会员价格")
-    private Double amount;
+    private BigDecimal amount;
 
     @Schema(description = "会员有效期天数")
     private Integer expiryDay;

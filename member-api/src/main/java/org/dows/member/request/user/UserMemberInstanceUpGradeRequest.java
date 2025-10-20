@@ -12,7 +12,4 @@ public class UserMemberInstanceUpGradeRequest {
 
     @Schema(description = "会员权益ID")
     private Long memberInterestsId;
-
-    @Schema(description = "应用ID")
-    private String appId;
 }
