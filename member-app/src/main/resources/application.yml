@@ -34,6 +34,29 @@ logging:
 pay:
   weixin:
     privateKeyPath: src/main/java/apiclient_key.pem
+  alipay:
+    appId: 2021006102659832
+    publicKey: MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQC8XSZx3zyif8LC6Vfya4eTv6Ty\n" +
+      "u4KBTf02efKl56zpJx6UuKZE4FM9RJm5eVSVuHqwmCH6lH9uPdmsBT44CckA9MZb\n" +
+      "Xkz2Z0L/mj5mhkZJx6YJp0j7Oy1Gb1VNiU0oHtApgE+z2i+bw7UrGKwPYsgfsSTf\n" +
+      "2Cdz9ZEgYJv9xZvpQQIDAQAB
+    privateKey: MIICdQIBADANBgkqhkiG9w0BAQEFAASCAl8wggJbAgEAAoGBALxdJnHfPKJ/wsLp\n" +
+      "V/Jrh5O/pPK7goFN/TZ58qXnrOknHpS4pkTgUz1Embl5VJW4erCYIfqUf2492awF\n" +
+      "PjgJyQD0xlteTPZnQv+aPmaGRknHpgmnSPs7LUZvVU2JTSge0CmAT7PaL5vDtSsY\n" +
+      "rA9iyB+xJN/YJ3P1kSBgm/3Fm+lBAgMBAAECf11x2KClHm9+8h+/ouGgdqHVcP76\n" +
+      "BsQe7H8aAEZNqHoB7inZcKK6ppC+d4SLrGqaGkOBNVoaUR1fkZzE/RjPwebdnZx6\n" +
+      "jgxkpZEWXe4ndGarbZkp/3F+eq4b2gbMTcsQ3BeyhZd/2wMgohnJsupOkjiG5AmJ\n" +
+      "RCTgExuhWgVc1QECQQDfof9DwU5z6fOK8qPCSDsPxy+q8dJ29UfvcFBYh19+wb0j\n" +
+      "CU8aPUUdh7M2GlrNNYsV4U6kQzSX6bthYG8OkTbRAkEA16Bf8eVNWL/uXAcwlNqr\n" +
+      "siro6wNKCu0PdL5qvzmBVChPBVv741QUKep9FV3k81ULVoDrDPsQt+v2ucVU1ZMH\n" +
+      "cQJAH6mxGafB8tl5+P9Xvkc5zYcXMa3hbaRW1gjh51brZ2gI3nAP+hgYtBCliBB9\n" +
+      "MLbXBXcMCmfVh3i5ZhUgREC9MQJBAM5moJC/KuuyRSroYvOJ4eJZOr2DV4Pf6fSZ\n" +
+      "NTs4g3iYYRPDOfkgCXEaGYOzbi4SkRjLrLOvPBCiGXk3z/3kkLECQQCMCO2BY4DD\n" +
+      "JW0vaknCxyYmErO/dqmK2U75tCqySxSunLDVrkVD+XqFlQb6eSEBzXiqMbcGVkMm\n" +
+      "4v9OPd8jVBjJ
+    certPath: src/main/resources/cert/alipayCertPublicKey_RSA2.crt
+    alipayPublicCertPath: src/main/resources/cert/appCertPublicKey_2021006101678499.crt
+    rootCertPath: src/main/resources/cert/alipayRootCert.crt
 
 ---
 #开发环境
