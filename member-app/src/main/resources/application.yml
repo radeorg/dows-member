@@ -54,8 +54,8 @@ pay:
       "NTs4g3iYYRPDOfkgCXEaGYOzbi4SkRjLrLOvPBCiGXk3z/3kkLECQQCMCO2BY4DD\n" +
       "JW0vaknCxyYmErO/dqmK2U75tCqySxSunLDVrkVD+XqFlQb6eSEBzXiqMbcGVkMm\n" +
       "4v9OPd8jVBjJ
-    certPath: src/main/resources/cert/alipayCertPublicKey_RSA2.crt
-    alipayPublicCertPath: src/main/resources/cert/appCertPublicKey_2021006101678499.crt
+    certPath: src/main/resources/cert/appCertPublicKey_2021006101678499.crt
+    alipayPublicCertPath: src/main/resources/cert/alipayCertPublicKey_RSA2.crt
     rootCertPath: src/main/resources/cert/alipayRootCert.crt
 
 ---
