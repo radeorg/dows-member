@@ -31,7 +31,7 @@ public class AliPayHandlerImpl implements AliPayHandler {
     @Override
     public AliPayQrCodeResponse aliPayQrCode(BigDecimal totalAmount, String description) {
         //订单号
-        String outTradeNo="";
+        String outTradeNo="20150320010101001";
         AliPayQrCodeResponse  aliPayQrCodeResponse = new AliPayQrCodeResponse();
         //证书模式
         AlipayTradePagePayRequest request = new AlipayTradePagePayRequest();
@@ -60,7 +60,7 @@ public class AliPayHandlerImpl implements AliPayHandler {
     @Override
     public AliPayQrCodeResponse aliPayQrCode1(BigDecimal totalAmount, String description) {
         //订单号
-        String outTradeNo="";
+        String outTradeNo="20150320010101001";
         AliPayQrCodeResponse  aliPayQrCodeResponse = new AliPayQrCodeResponse();
         // 1. 初始化预创建订单请求
         AlipayTradePrecreateRequest request = new AlipayTradePrecreateRequest();

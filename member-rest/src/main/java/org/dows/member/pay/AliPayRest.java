@@ -25,7 +25,7 @@ public class AliPayRest implements AliPayApi {
 
     @Override
     public AliPayQrCodeResponse aliPayQrCode1(AliPayQrCodeRequest request) {
-        return aliPayHandler.aliPayQrCode( request.getTotalAmount(), request.getDescription());
+        return aliPayHandler.aliPayQrCode1( request.getTotalAmount(), request.getDescription());
     }
 
     @Override
