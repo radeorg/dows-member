@@ -1,7 +1,6 @@
-package org.dows.member.config;
+package org.dows.member.handler.config;
 
 import com.alipay.api.*;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
 public class AliPayConfig {

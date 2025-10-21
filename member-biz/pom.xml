@@ -30,5 +30,11 @@
       <artifactId>wechatpay-java</artifactId>
       <version>0.2.15</version>
     </dependency>
+    <!-- 支付宝支付V3 SDK -->
+    <dependency>
+      <groupId>com.alipay.sdk</groupId>
+      <artifactId>alipay-sdk-java</artifactId>
+      <version>4.35.79.ALL</version>
+    </dependency>
   </dependencies>
 </project>

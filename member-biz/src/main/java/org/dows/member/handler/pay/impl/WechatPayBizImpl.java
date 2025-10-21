@@ -24,7 +24,6 @@ import org.dows.member.handler.user.UserMemberInstanceBiz;
 import org.dows.member.request.pay.WechatPayQrCodeRequest;
 import org.dows.member.response.pay.PayQrCodeResponse;
 import org.dows.member.response.pay.WechatPayStatusResponse;
-import org.dows.member.handler.pay.WechatPayBiz;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
