@@ -5,7 +5,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.dows.member.api.pay.WechatPayApi;
 import org.dows.member.handler.pay.PaymentBiz;
-import org.dows.member.handler.pay.WechatPayBiz;
+//import org.dows.member.handler.pay.WechatPayBiz;
 import org.dows.member.request.pay.CreateNativePayQrCodeRequest;
 import org.dows.member.response.pay.PayQrCodeResponse;
 import org.dows.member.response.pay.WechatPayStatusResponse;
@@ -19,7 +19,7 @@ import java.util.Map;
 public class WechatPayRest implements WechatPayApi {
 
     private final PaymentBiz paymentBiz;
-    private final WechatPayBiz wechatPayBiz;
+//    private final WechatPayBiz wechatPayBiz;
 
     @Override
     public PayQrCodeResponse wechatPayQrCode(CreateNativePayQrCodeRequest request) {
@@ -28,7 +28,8 @@ public class WechatPayRest implements WechatPayApi {
 
     @Override
     public Map<String, String> wechatPayNotify(HttpServletRequest request) {
-        return wechatPayBiz.wechatPayNotify(request);
+//        return wechatPayBiz.wechatPayNotify(request);
+        return null;
     }
 
     @Override

@@ -10,7 +10,7 @@ import org.dows.member.enums.MemberChargeTypeEnum;
 import org.dows.member.enums.MemberTypeEnum;
 import org.dows.member.exception.MemberException;
 import org.dows.member.handler.pay.PaymentBiz;
-import org.dows.member.handler.pay.WechatPayBiz;
+//import org.dows.member.handler.pay.WechatPayBiz;
 import org.dows.member.handler.user.UserMemberChargeHandler;
 import org.dows.member.request.pay.CreateNativePayQrCodeRequest;
 import org.dows.member.request.pay.WechatPayQrCodeRequest;
@@ -29,7 +29,7 @@ public class PaymentBizImpl implements PaymentBiz {
     private final MemberInstanceService memberInstanceService;
     private final MemberInterestsService memberInterestsService;
     private final UserMemberChargeHandler userMemberChargeHandler;
-    private final WechatPayBiz wechatPayBiz;
+//    private final WechatPayBiz wechatPayBiz;
 
     @Override
     public PayQrCodeResponse createNativePayment(CreateNativePayQrCodeRequest request) {
@@ -62,7 +62,7 @@ public class PaymentBizImpl implements PaymentBiz {
             payQrCodeRequest.setTotalAmount(interests.getAmount());
             payQrCodeRequest.setDescription(chargeEntity.getNote());
 
-            return wechatPayBiz.wechatPayQrCode(payQrCodeRequest);
+//            return wechatPayBiz.wechatPayQrCode(payQrCodeRequest);
         }
         return null;
     }
