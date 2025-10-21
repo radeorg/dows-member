@@ -3,7 +3,6 @@ package org.dows.member.handler.user.impl;
 import com.mybatisflex.core.query.QueryWrapper;
 import lombok.RequiredArgsConstructor;
 import org.dows.member.entity.MemberChargeEntity;
-import org.dows.member.enums.MemberChangeStateEnum;
 import org.dows.member.enums.MemberChargeStateEnum;
 import org.dows.member.enums.MemberPayTradeState;
 import org.dows.member.handler.user.UserMemberChargeHandler;
