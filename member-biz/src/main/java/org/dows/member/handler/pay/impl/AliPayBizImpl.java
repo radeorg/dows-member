@@ -14,8 +14,8 @@ import com.alipay.api.response.AlipayTradePrecreateResponse;
 import com.alipay.api.response.AlipayTradeQueryResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
-import org.dows.member.config.AliPayConfig;
-import org.dows.member.handler.pay.AliPayHandler;
+import org.dows.member.handler.config.AliPayConfig;
+import org.dows.member.handler.pay.AliPayBiz;
 import org.dows.member.response.AliPayQrCodeResponse;
 import org.dows.member.response.AliPayStatusResponse;
 import org.springframework.stereotype.Component;
@@ -27,7 +27,7 @@ import java.util.Map;
 
 @Component
 @RequiredArgsConstructor
-public class AliPayHandlerImpl implements AliPayHandler {
+public class AliPayBizImpl implements AliPayBiz {
     @Override
     public AliPayQrCodeResponse aliPayQrCode(BigDecimal totalAmount, String description) {
         //订单号

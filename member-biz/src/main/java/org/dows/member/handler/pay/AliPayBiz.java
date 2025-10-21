@@ -5,7 +5,7 @@ import org.dows.member.response.AliPayQrCodeResponse;
 import org.dows.member.response.AliPayStatusResponse;
 import java.math.BigDecimal;
 
-public interface AliPayHandler {
+public interface AliPayBiz {
 
     AliPayQrCodeResponse aliPayQrCode(BigDecimal totalAmount, String description);
 

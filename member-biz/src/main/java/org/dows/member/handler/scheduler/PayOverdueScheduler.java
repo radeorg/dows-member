@@ -1,19 +1,16 @@
 package org.dows.member.handler.scheduler;
 
-import com.wechat.pay.java.service.payments.model.Transaction;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.dows.member.entity.MemberChargeEntity;
 import org.dows.member.enums.MemberChargeStateEnum;
-import org.dows.member.handler.pay.AliPayHandler;
+import org.dows.member.handler.pay.AliPayBiz;
 import org.dows.member.handler.pay.WechatPayBiz;
 import org.dows.member.handler.user.UserMemberChargeHandler;
-import org.dows.member.handler.user.UserMemberInstanceHandler;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -26,7 +23,7 @@ import java.util.List;
 public class PayOverdueScheduler {
 
     private final UserMemberChargeHandler userMemberChargeHandler;
-    private final AliPayHandler aliPayHandler;
+    private final AliPayBiz aliPayBiz;
     private final WechatPayBiz wechatPayBiz;
 
     // 每天01:00:00执行（CRON表达式）
@@ -43,9 +40,9 @@ public class PayOverdueScheduler {
                     userMemberChargeHandler.updateNotPayMemberCharge(memberChargeEntity.getMemberInterestsId(),MemberChargeStateEnum.FAILED.getCode());
                 }
             }else if ("alipay".equals(memberChargeEntity.getChannel())){
-                String aliPayStatus=aliPayHandler.aliPayStatus(memberChargeEntity.getPayNo()).getTradeState();
+                String aliPayStatus= aliPayBiz.aliPayStatus(memberChargeEntity.getPayNo()).getTradeState();
                 //TRADE_CLOSED 过期  FAIL失败
-                if ("TRADE_CLOSED".equals(aliPayStatus)||"FAIL".equals(aliPayHandler.aliPayStatus(aliPayStatus))){
+                if ("TRADE_CLOSED".equals(aliPayStatus)||"FAIL".equals(aliPayBiz.aliPayStatus(aliPayStatus))){
                     //修改订单状态
                     userMemberChargeHandler.updateNotPayMemberCharge(memberChargeEntity.getMemberInterestsId(),MemberChargeStateEnum.FAILED.getCode());
                 }
