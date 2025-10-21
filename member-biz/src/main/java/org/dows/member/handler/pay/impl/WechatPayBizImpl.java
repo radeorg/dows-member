@@ -14,6 +14,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.dows.member.entity.MemberChargeEntity;
+import org.dows.member.enums.MemberChargeStateEnum;
 import org.dows.member.enums.MemberChargeTypeEnum;
 import org.dows.member.exception.MemberException;
 import org.dows.member.exception.WechatPayException;
@@ -129,39 +130,39 @@ public class WechatPayBizImpl implements WechatPayBiz {
     @Override
     public WechatPayStatusResponse wechatPayStatus(String outTradeNo) {
         WechatPayStatusResponse wechatPayStatusResponse = new WechatPayStatusResponse();
-
         // 1. 先查本地数据库
-        //  Order order = orderMapper.selectByOutTradeNo(outTradeNo);
-//        if (order == null) {
-//            throw new BusinessException("订单不存在");
-//        }
+        MemberChargeEntity memberCharge = userMemberChargeHandler.getByPayNo(outTradeNo);
+        if (memberCharge == null) {
+            wechatPayStatusResponse.setTradeState(MemberChargeStateEnum.FAILED.getCode());
+            wechatPayStatusResponse.setTradeStateDesc("订单不存在");
+            return wechatPayStatusResponse;
+        }
 
-        // 2. 如果本地状态已明确（成功/关闭），直接返回
-//        if ("PAID".equals(order.getStatus()) || "CLOSED".equals(order.getStatus())) {
-//            return buildOrderStatusVO(order);
-//        }
+        // 2. 如果本地状态已明确（成功/关闭），直接返回 支付中的查询下状态 充值状态(0:pending,1:completed,2:failed,3:refunded)
+        if (!MemberChargeStateEnum.PENGDING.equals(memberCharge.getState())) {
+            wechatPayStatusResponse.setTradeState(memberCharge.getState());
+            wechatPayStatusResponse.setTradeStateDesc(MemberChargeStateEnum.getDescByCode(memberCharge.getState()));
+            return wechatPayStatusResponse;
+        }
 
-        // 3. 本地状态未明确，调用微信支付查单接口确认
+        // 3. 待支付的订单
         QueryOrderByOutTradeNoRequest request = new QueryOrderByOutTradeNoRequest();
         request.setOutTradeNo(outTradeNo);
         request.setMchid(wechatPayProperties.getMerchantId());
-
         Transaction transaction = nativePayService.queryOrderByOutTradeNo(request);
         String stateDesc = transaction != null ? transaction.getTradeStateDesc() : "订单不存在";
+        String state = transaction != null ? transaction.getTradeState().name() : "FAIL";
         wechatPayStatusResponse.setTradeStateDesc(stateDesc);
         if (transaction != null && TradeState.SUCCESS.equals(transaction.getTradeState())) {
             // 支付成功，处理后续业务（如更新订单状态、发货等）
-            System.out.println("支付成功，微信订单号：" + transaction.getTransactionId());
             wechatPayStatusResponse.setSuccessTime(transaction.getSuccessTime());
             // 4. 更新本地订单状态
-        } else {
-            // 支付未成功，根据状态做进一步处理
-            System.out.println("支付未成功：" + stateDesc);
         }
+        wechatPayStatusResponse.setTradeState(state);
         return wechatPayStatusResponse;
     }
 
-    private Date payTimeToPareDate(String successTime){
+    private Date payTimeToPareDate(String successTime) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssXXX");
         ZonedDateTime zonedDateTime = ZonedDateTime.parse(successTime, formatter);
         return Date.from(zonedDateTime.toInstant());
