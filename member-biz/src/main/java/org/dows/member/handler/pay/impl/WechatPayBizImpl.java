@@ -154,8 +154,6 @@ public class WechatPayBizImpl implements WechatPayBiz {
             System.out.println("支付成功，微信订单号：" + transaction.getTransactionId());
             wechatPayStatusResponse.setSuccessTime(transaction.getSuccessTime());
             // 4. 更新本地订单状态
-public class WechatPayBizImpl implements WechatPayBiz {
-
         } else {
             // 支付未成功，根据状态做进一步处理
             System.out.println("支付未成功：" + stateDesc);
