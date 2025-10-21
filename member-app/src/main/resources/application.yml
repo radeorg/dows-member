@@ -32,8 +32,8 @@ logging:
     root: info
 
 pay:
-  weixin:
-    privateKeyPath: src/main/java/apiclient_key.pem
+  wx:
+    privateKeyPath: cert/apiclient_key.pem
   alipay:
     appId: 2021006102659832
     publicKey: MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQC8XSZx3zyif8LC6Vfya4eTv6Ty\n" +
@@ -54,9 +54,9 @@ pay:
       "NTs4g3iYYRPDOfkgCXEaGYOzbi4SkRjLrLOvPBCiGXk3z/3kkLECQQCMCO2BY4DD\n" +
       "JW0vaknCxyYmErO/dqmK2U75tCqySxSunLDVrkVD+XqFlQb6eSEBzXiqMbcGVkMm\n" +
       "4v9OPd8jVBjJ
-    certPath: src/main/resources/cert/appCertPublicKey_2021006101678499.crt
-    alipayPublicCertPath: src/main/resources/cert/alipayCertPublicKey_RSA2.crt
-    rootCertPath: src/main/resources/cert/alipayRootCert.crt
+    certPath: cert/appCertPublicKey_2021006101678499.crt
+    alipayPublicCertPath: cert/alipayCertPublicKey_RSA2.crt
+    rootCertPath: cert/alipayRootCert.crt
 
 ---
 #开发环境
