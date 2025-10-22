@@ -4,7 +4,6 @@ import com.mybatisflex.core.query.QueryWrapper;
 import lombok.RequiredArgsConstructor;
 import org.dows.member.entity.MemberChargeEntity;
 import org.dows.member.enums.MemberChargeStateEnum;
-import org.dows.member.enums.MemberPayTradeState;
 import org.dows.member.handler.user.UserMemberChargeHandler;
 import org.dows.member.request.user.UserMemberChargeSaveRequest;
 import org.dows.member.service.MemberChargeService;
@@ -31,7 +30,7 @@ public class UserMemberChargeHandlerImpl implements UserMemberChargeHandler {
         entity.setChannel(request.getChannel());
         entity.setNote(request.getNote());
         entity.setChargeType(request.getChargeType());
-        entity.setState(MemberPayTradeState.USER_PAYING.getCode());
+        entity.setState(MemberChargeStateEnum.WAIT_PAY.getCode());
 
         memberChargeService.save(entity);
 
@@ -39,13 +38,8 @@ public class UserMemberChargeHandlerImpl implements UserMemberChargeHandler {
     }
 
     @Override
-    public MemberChargeEntity getByPayNo(String payNo) {
-        return memberChargeService.getOne(QueryWrapper.create().eq(MemberChargeEntity::getPayNo, payNo));
-    }
-
-    @Override
     public List<MemberChargeEntity> listNotPayMemberCharge() {
-        return memberChargeService.list(QueryWrapper.create().eq(MemberChargeEntity::getState, MemberChargeStateEnum.PENGDING.getCode()));
+        return memberChargeService.list(QueryWrapper.create().eq(MemberChargeEntity::getState, MemberChargeStateEnum.WAIT_PAY.getCode()));
     }
 
     @Override

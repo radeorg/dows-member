@@ -12,8 +12,6 @@ public interface UserMemberChargeHandler {
      */
     MemberChargeEntity save(UserMemberChargeSaveRequest request);
 
-    MemberChargeEntity getByPayNo(String payNo);
-
     /**
      * 查询未支付的订单
      */

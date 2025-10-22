@@ -5,27 +5,29 @@ import lombok.Getter;
 import java.util.Objects;
 
 /**
- * 会员充值状态
+ * 微信支付状态
  */
 @Getter
-public enum MemberChargeStateEnum {
+public enum WechatPayStateEnum {
 
-    WAIT_PAY("WAIT_PAY", "待支付"),
-    SUCCESS("SUCCESS", "支付完成"),
-    FAILED("FAILED", "支付失败"),
-    REFUNDED("REFUNDED", "已退款"),
-    CLOSED("CLOSED", "已关闭"),;
+    SUCCESS("SUCCESS", "支付成功"),
+    REFUND("REFUND", "转入退款"),
+    NOT_PAY("NOTPAY", "未付款"),
+    CLOSED("CLOSED", "已关闭"),
+    REVOKED("REVOKED", "已撤销"),
+    USER_PAYING("USERPAYING", "用户支付中"),
+    PAY_ERROR("REVOKED", "支付失败");
 
     private final String code;
     private final String description;
 
-    MemberChargeStateEnum(String code, String description) {
+    WechatPayStateEnum(String code, String description) {
         this.code = code;
         this.description = description;
     }
 
-    public static MemberChargeStateEnum getByCode(String code, boolean throwException) {
-        for (MemberChargeStateEnum type : MemberChargeStateEnum.values()) {
+    public static WechatPayStateEnum getByCode(String code, boolean throwException) {
+        for (WechatPayStateEnum type : WechatPayStateEnum.values()) {
             if (Objects.equals(type.getCode(), code)) {
                 return type;
             }
@@ -37,7 +39,7 @@ public enum MemberChargeStateEnum {
     }
 
     public static String getDescByCode(String code) {
-        for (MemberChargeStateEnum type : MemberChargeStateEnum.values()) {
+        for (WechatPayStateEnum type : WechatPayStateEnum.values()) {
             if (Objects.equals(type.getCode(), code)) {
                 return type.getDescription();
             }

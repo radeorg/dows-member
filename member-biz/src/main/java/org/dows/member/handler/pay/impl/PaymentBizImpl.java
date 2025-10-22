@@ -8,11 +8,14 @@ import org.dows.member.entity.MemberInstanceEntity;
 import org.dows.member.entity.MemberInterestsEntity;
 import org.dows.member.enums.MemberChargeTypeEnum;
 import org.dows.member.enums.MemberTypeEnum;
+import org.dows.member.enums.PayChannelEnum;
 import org.dows.member.exception.MemberException;
+import org.dows.member.handler.pay.AliPayBiz;
 import org.dows.member.handler.pay.PaymentBiz;
 //import org.dows.member.handler.pay.WechatPayBiz;
 import org.dows.member.handler.user.UserMemberChargeHandler;
-import org.dows.member.request.pay.CreateNativePayQrCodeRequest;
+import org.dows.member.request.pay.AliPayQrCodeRequest;
+import org.dows.member.request.pay.PayQrCodeRequest;
 import org.dows.member.request.pay.WechatPayQrCodeRequest;
 import org.dows.member.request.user.UserMemberChargeSaveRequest;
 import org.dows.member.response.pay.PayQrCodeResponse;
@@ -30,9 +33,10 @@ public class PaymentBizImpl implements PaymentBiz {
     private final MemberInterestsService memberInterestsService;
     private final UserMemberChargeHandler userMemberChargeHandler;
 //    private final WechatPayBiz wechatPayBiz;
+    private final AliPayBiz aliPayBiz;
 
     @Override
-    public PayQrCodeResponse createNativePayment(CreateNativePayQrCodeRequest request) {
+    public PayQrCodeResponse createNativePayment(PayQrCodeRequest request) {
         // 查询会员实例
         MemberInstanceEntity oldInstance = getMemberInterestsByAccountInstanceIdAndAppId(
                 request.getAccountInstanceId(),
@@ -56,13 +60,20 @@ public class PaymentBizImpl implements PaymentBiz {
                 MemberChargeTypeEnum.getDescByCode(chargeType));
 
         // 调用第三方支付
-        if (request.getPayChannel().equals("Wechat")) {
+        if (request.getPayChannel().equals(PayChannelEnum.WECHAT.getCode())) {
             WechatPayQrCodeRequest payQrCodeRequest = new WechatPayQrCodeRequest();
             payQrCodeRequest.setOutTradeNo(chargeEntity.getPayNo());
             payQrCodeRequest.setTotalAmount(interests.getAmount());
             payQrCodeRequest.setDescription(chargeEntity.getNote());
 
 //            return wechatPayBiz.wechatPayQrCode(payQrCodeRequest);
+        } else if (request.getPayChannel().equals(PayChannelEnum.ALI.getCode())){
+            AliPayQrCodeRequest payQrCodeRequest = new AliPayQrCodeRequest();
+            payQrCodeRequest.setOutTradeNo(chargeEntity.getPayNo());
+            payQrCodeRequest.setTotalAmount(interests.getAmount());
+            payQrCodeRequest.setSubject(chargeEntity.getNote());
+
+            return aliPayBiz.aliPayQrCode(payQrCodeRequest);
         }
         return null;
     }
@@ -87,7 +98,7 @@ public class PaymentBizImpl implements PaymentBiz {
 
     private String validateMemberInterest(MemberInstanceEntity oldInstance,
                                           MemberInterestsEntity interests,
-                                          CreateNativePayQrCodeRequest request){
+                                          PayQrCodeRequest request){
         if (request.getChargeType().equals(MemberChargeTypeEnum.RENEWAL.getCode())) {
             // 校验续费的等级跟当前等级是否一致
             if (!oldInstance.getMemberInterestsId().equals(request.getMemberInterestsId())) {

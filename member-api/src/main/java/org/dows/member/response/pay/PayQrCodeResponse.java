@@ -12,7 +12,4 @@ public class PayQrCodeResponse {
 
     @Schema(description = "二维码链接")
     private String qrCode;
-
-    @Schema(description = "过期时间")
-    private String expirationTime;
 }

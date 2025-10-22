@@ -13,7 +13,6 @@ import org.dows.member.handler.user.UserMemberChangeHandler;
 import org.dows.member.handler.user.UserMemberInstanceBiz;
 import org.dows.member.handler.user.UserMemberMetricsHandler;
 import org.dows.member.request.user.UserMemberInstanceSaveRequest;
-import org.dows.member.service.MemberChargeService;
 import org.dows.member.service.MemberInstanceService;
 import org.dows.member.service.MemberInterestsService;
 import org.springframework.stereotype.Component;
@@ -31,7 +30,6 @@ public class UserMemberInstanceBizImpl implements UserMemberInstanceBiz {
     private final MemberInterestsService memberInterestsService;
     private final UserMemberMetricsHandler userMemberMetricsHandler;
     private final UserMemberChangeHandler userMemberChangeHandler;
-    private final MemberChargeService memberChargeService;
 
     @Transactional
     @Override
@@ -78,9 +76,6 @@ public class UserMemberInstanceBizImpl implements UserMemberInstanceBiz {
         // 更新会员等级信息
         MemberInstanceEntity newInstance = updateMemberInstance(oldInstance, interests);
 
-        // 更新充值状态
-        memberChargeService.updateById(memberCharge);
-
         // 新增会员变更记录表
         userMemberChangeHandler.save(oldInstance,
                 newInstance,
@@ -114,9 +109,6 @@ public class UserMemberInstanceBizImpl implements UserMemberInstanceBiz {
                 newInstance,
                 interests,
                 MemberChangeTypeEnum.RENEWAL.getCode());
-
-        // 更新充值状态
-        memberChargeService.updateById(memberCharge);
 
         // 更新或新增会员度量表
         userMemberMetricsHandler.saveOrUpdate(oldInstance, interests);

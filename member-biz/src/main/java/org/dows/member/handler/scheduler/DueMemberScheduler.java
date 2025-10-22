@@ -1,49 +1,53 @@
 package org.dows.member.handler.scheduler;
 
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.dows.member.handler.user.UserMemberInstanceBiz;
 import org.dows.member.handler.user.UserMemberInstanceHandler;
 import org.dows.member.response.MemberInstanceGetResponse;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.scheduling.annotation.EnableScheduling;
-import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
+import org.springframework.scheduling.support.CronTrigger;
 
 import java.util.List;
-import java.util.Objects;
 
 /**
- * 会员到期自动降级为免费会员线程
+ * 会员到期调度服务
+ * 每隔10分钟执行过期会员降级处理
  */
 @RequiredArgsConstructor
 @Configuration
-@EnableScheduling
 @Slf4j
 public class DueMemberScheduler {
 
     private final UserMemberInstanceHandler userMemberInstanceHandler;
     private final UserMemberInstanceBiz userMemberInstanceBiz;
-    private final ThreadPoolTaskExecutor dueMemberInstanceTaskExecutor;
+    private final ThreadPoolTaskScheduler dueMemberTaskScheduler;
 
-    // 每天00:00:00执行（CRON表达式）
-    @Scheduled(cron = "0 */10 * * * ?")
-    public void dueTask() {
-        log.info("DueMemberScheduler定时任务执行开始: {}", System.currentTimeMillis());
+    /**
+     * 初始化时注册定时任务
+     */
+    @PostConstruct
+    public void init() {
+        dueMemberTaskScheduler.schedule(this::processDueMembers, new CronTrigger("0 */10 * * * ?"));
+        log.info("DueMemberScheduler定时任务注册成功，执行频率：每隔10分钟");
+    }
 
-        dueMemberInstanceTaskExecutor.execute(() -> {
-            try {
-                List<MemberInstanceGetResponse> list = userMemberInstanceHandler.listDueMemberInstance();
-                if (Objects.nonNull(list)) {
-                    list.forEach(instance -> {
-                        userMemberInstanceBiz.due(instance.getMemberInstanceId());
-                    });
-                }
-            } catch (Exception e) {
-                log.error("处理到期会员异常", e);
-            }
-        });
+    private void processDueMembers() {
+        try {
+            List<MemberInstanceGetResponse> members = userMemberInstanceHandler.listDueMemberInstance();
+            if (members.isEmpty()) return;
 
-        log.info("DueMemberScheduler定时任务执行结束: {}", System.currentTimeMillis());
+            long count = members.stream()
+                    .peek(m -> {
+                        try { userMemberInstanceBiz.due(m.getMemberInstanceId()); }
+                        catch (Exception e) { log.error("处理失败：{}", m.getMemberInstanceId(), e); }
+                    })
+                    .count();
+            log.info("处理完成：{}条记录", count);
+        } catch (Exception e) {
+            log.error("处理异常", e);
+        }
     }
 }

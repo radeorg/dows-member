@@ -1,53 +1,34 @@
 package org.dows.member.handler.config;
 
+import cn.hutool.core.io.resource.ClassPathResource;
 import com.alipay.api.*;
-import org.springframework.beans.factory.annotation.Value;
+import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
+@Configuration
+@RequiredArgsConstructor
 public class AliPayConfig {
-    /**
-     * 商户号
-     */
-    @Value("${pay.alipay.appId}")
-    public static String appId;
-    /**
-     * 应用私钥
-     */
-    @Value("${pay.alipay.privateKey}")
-    public static  String privateKey;
 
-    /**
-     * 应用私钥
-     */
-    @Value("${pay.alipay.publicKey}")
-    public static  String publicKey;
-    /**
-     * 应用公钥证书本地路径
-     */
-    @Value("${pay.alipay.certPath}")
-    public static String certPath;
-    /**
-     * 支付宝公钥证书本地路径
-     */
-    @Value("${pay.alipay.alipayPublicCertPath}")
-    public static String alipayPublicCertPath;
-    /**
-     * 支付宝根证书本地路径
-     */
-    @Value("${pay.alipay.rootCertPath}")
-    public static String rootCertPath;
+    private final AliPayProperties aliPayProperties;
 
-   //证书模式
-    public static AlipayClient aliPayClient()  {
+    // 证书模式
+    @Bean
+    public AlipayClient aliPayClient()  {
+        ClassPathResource certPath = new ClassPathResource(aliPayProperties.getCertPath());
+        ClassPathResource publicCertPath = new ClassPathResource(aliPayProperties.getAliPayPublicCertPath());
+        ClassPathResource rootCertPath = new ClassPathResource(aliPayProperties.getRootCertPath());
+
         CertAlipayRequest certRequest = new CertAlipayRequest();
-        certRequest.setServerUrl("https://openapi.alipay.com/gateway.do");
-        certRequest.setAppId(appId);
-        certRequest.setPrivateKey(privateKey);
-        certRequest.setFormat("json");
-        certRequest.setCharset("UTF-8");
-        certRequest.setSignType("RSA2");
-        certRequest.setCertPath(certPath);
-        certRequest.setAlipayPublicCertPath(alipayPublicCertPath);
-        certRequest.setRootCertPath(rootCertPath);
+        certRequest.setServerUrl(aliPayProperties.getServerUrl());
+        certRequest.setAppId(aliPayProperties.getAppId());
+        certRequest.setPrivateKey(aliPayProperties.getPrivateKey());
+        certRequest.setFormat(aliPayProperties.getFormat());
+        certRequest.setCharset(aliPayProperties.getCharset());
+        certRequest.setSignType(aliPayProperties.getSignType());
+        certRequest.setCertPath(certPath.getUrl().getPath());
+        certRequest.setAlipayPublicCertPath(publicCertPath.getUrl().getPath());
+        certRequest.setRootCertPath(rootCertPath.getUrl().getPath());
         AlipayClient alipayClient = null;
         try {
             alipayClient = new DefaultAlipayClient(certRequest);
@@ -56,19 +37,4 @@ public class AliPayConfig {
         }
         return  alipayClient;
     }
-
-    //密钥的加密方式  把公钥配置在支付宝里面
-    public static AlipayConfig getAlipayConfig() {
-        AlipayConfig alipayConfig = new AlipayConfig();
-        alipayConfig.setServerUrl("https://openapi.alipay.com/gateway.do");
-        alipayConfig.setAppId(appId);
-        alipayConfig.setPrivateKey(privateKey);
-        alipayConfig.setFormat("json");
-        alipayConfig.setAlipayPublicKey(publicKey);
-        alipayConfig.setCharset("UTF-8");
-        alipayConfig.setSignType("RSA2");
-        return alipayConfig;
-    }
-
-
 }

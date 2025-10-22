@@ -1,6 +1,7 @@
 package org.dows.member.handler.scheduler;
 
 import com.mybatisflex.core.paginate.Page;
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.dows.member.form.PageQuery;
@@ -9,78 +10,66 @@ import org.dows.member.handler.user.UserMemberMetricsBiz;
 import org.dows.member.request.admin.AdminMemberInstanceQueryRequest;
 import org.dows.member.response.MemberInstanceGetResponse;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.scheduling.annotation.EnableScheduling;
-import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
+import org.springframework.scheduling.support.CronTrigger;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * 生成每日会员度量数据线程
  */
 @RequiredArgsConstructor
 @Configuration
-@EnableScheduling
 @Slf4j
 public class DailyMemberMetricsScheduler {
 
-    private static final int PAGE_SIZE = 100; // 5线程*10条/线程
-    private static final int EXECUTE_NUM = 20; // 每个线程执行的条数
+    private static final int PAGE_SIZE = 100; // 每页大小
+    private static final int BATCH_SIZE = 20; // 每个线程处理的条数
     private final UserMemberMetricsBiz userMemberMetricsBiz;
     private final AdminMemberInstanceHandler adminMemberInstanceHandler;
-    private final ThreadPoolTaskExecutor dailyMemberMetricsTaskExecutor;
+    private final ThreadPoolTaskScheduler dailyMemberMetricsTaskScheduler;
 
-    // 每天00:00:00执行（CRON表达式）
-    @Scheduled(cron = "0 0 0 * * ?")
-    public void dailyTask() {
-        try {
-            int currentPage = 1; // 重置页码为1，确保每次定时任务都从第一页开始处理
-            while (true) {
-                AdminMemberInstanceQueryRequest request = buildRequest();
-                PageQuery pageQuery = new PageQuery();
-                pageQuery.setPageSize(PAGE_SIZE);
-                pageQuery.setPageNum(currentPage);
+    // 初始化时注册定时任务（替代@Scheduled注解）
+    @PostConstruct
+    public void init() {
+        dailyMemberMetricsTaskScheduler.schedule(this::processAllData, new CronTrigger("0 0 0 * * ?"));
+        log.info("DailyMemberMetricsScheduler定时任务注册成功，执行频率：每日凌晨");
+    }
 
-                Page<MemberInstanceGetResponse> page = adminMemberInstanceHandler.query(pageQuery, request);
-                if (page.getRecords().isEmpty()) {
-                    break; // 没有更多数据，退出循环
-                }
+    private void processAllData() {
+        log.info("开始生成每日会员度量数据");
 
-                processBatch(page.getRecords());
+        int pageNum = 1;
+        while (true) {
+            PageQuery pageQuery = new PageQuery();
+            pageQuery.setPageSize(PAGE_SIZE);
+            pageQuery.setPageNum(pageNum);
+            Page<MemberInstanceGetResponse> page = adminMemberInstanceHandler.query(pageQuery, new AdminMemberInstanceQueryRequest());
 
-                if (!page.hasNext()) {
-                    break; // 没有下一页，退出循环
-                }
-                currentPage++;
+            if (page.getRecords().isEmpty()) break;
+
+            // 并行处理当前页数据
+            List<CompletableFuture<Void>> futures = new ArrayList<>();
+            for (int i = 0; i < page.getRecords().size(); i += BATCH_SIZE) {
+                int end = Math.min(i + BATCH_SIZE, page.getRecords().size());
+                List<MemberInstanceGetResponse> batch = page.getRecords().subList(i, end);
+
+                futures.add(CompletableFuture.runAsync(() ->
+                        batch.forEach(record ->
+                                userMemberMetricsBiz.saveDailyMemberMetrics(record.getMemberInstanceId())
+                        ), dailyMemberMetricsTaskScheduler
+                ));
             }
-        } catch (Exception e) {
-            log.error("生成每日会员度量数据调度异常", e);
-        }
-    }
-    private AdminMemberInstanceQueryRequest buildRequest() {
-        return new AdminMemberInstanceQueryRequest();
-    }
 
-    private void processBatch(List<MemberInstanceGetResponse> records)
-            throws InterruptedException {
-        CountDownLatch latch = new CountDownLatch((int) Math.ceil((double) records.size() / EXECUTE_NUM));
+            // 等待当前页所有批次完成
+            CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
 
-        for (int i = 0; i < records.size(); i += EXECUTE_NUM) {
-            int end = Math.min(i + EXECUTE_NUM, records.size());
-            List<MemberInstanceGetResponse> tempRecords = records.subList(i, end);
-            dailyMemberMetricsTaskExecutor.execute(() -> {
-                try {
-                    for (MemberInstanceGetResponse tempRecord : tempRecords) {
-                        userMemberMetricsBiz.saveDailyMemberMetrics(tempRecord.getMemberInstanceId());
-                    }
-                } catch (Exception e) {
-                    log.error("生成每日会员度量数据异常", e);
-                }finally {
-                    latch.countDown();
-                }
-            });
+            if (!page.hasNext()) break;
+            pageNum++;
         }
-        latch.await(); // 等待所有任务完成
+
+        log.info("每日会员度量数据生成完成");
     }
 }
