@@ -31,32 +31,27 @@ logging:
   level:
     root: info
 
-pay:
-  wx:
-    privateKeyPath: cert/apiclient_key.pem
-  alipay:
-    appId: 2021006102659832
-    publicKey: MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQC8XSZx3zyif8LC6Vfya4eTv6Ty\n" +
-      "u4KBTf02efKl56zpJx6UuKZE4FM9RJm5eVSVuHqwmCH6lH9uPdmsBT44CckA9MZb\n" +
-      "Xkz2Z0L/mj5mhkZJx6YJp0j7Oy1Gb1VNiU0oHtApgE+z2i+bw7UrGKwPYsgfsSTf\n" +
-      "2Cdz9ZEgYJv9xZvpQQIDAQAB
-    privateKey: MIICdQIBADANBgkqhkiG9w0BAQEFAASCAl8wggJbAgEAAoGBALxdJnHfPKJ/wsLp\n" +
-      "V/Jrh5O/pPK7goFN/TZ58qXnrOknHpS4pkTgUz1Embl5VJW4erCYIfqUf2492awF\n" +
-      "PjgJyQD0xlteTPZnQv+aPmaGRknHpgmnSPs7LUZvVU2JTSge0CmAT7PaL5vDtSsY\n" +
-      "rA9iyB+xJN/YJ3P1kSBgm/3Fm+lBAgMBAAECf11x2KClHm9+8h+/ouGgdqHVcP76\n" +
-      "BsQe7H8aAEZNqHoB7inZcKK6ppC+d4SLrGqaGkOBNVoaUR1fkZzE/RjPwebdnZx6\n" +
-      "jgxkpZEWXe4ndGarbZkp/3F+eq4b2gbMTcsQ3BeyhZd/2wMgohnJsupOkjiG5AmJ\n" +
-      "RCTgExuhWgVc1QECQQDfof9DwU5z6fOK8qPCSDsPxy+q8dJ29UfvcFBYh19+wb0j\n" +
-      "CU8aPUUdh7M2GlrNNYsV4U6kQzSX6bthYG8OkTbRAkEA16Bf8eVNWL/uXAcwlNqr\n" +
-      "siro6wNKCu0PdL5qvzmBVChPBVv741QUKep9FV3k81ULVoDrDPsQt+v2ucVU1ZMH\n" +
-      "cQJAH6mxGafB8tl5+P9Xvkc5zYcXMa3hbaRW1gjh51brZ2gI3nAP+hgYtBCliBB9\n" +
-      "MLbXBXcMCmfVh3i5ZhUgREC9MQJBAM5moJC/KuuyRSroYvOJ4eJZOr2DV4Pf6fSZ\n" +
-      "NTs4g3iYYRPDOfkgCXEaGYOzbi4SkRjLrLOvPBCiGXk3z/3kkLECQQCMCO2BY4DD\n" +
-      "JW0vaknCxyYmErO/dqmK2U75tCqySxSunLDVrkVD+XqFlQb6eSEBzXiqMbcGVkMm\n" +
-      "4v9OPd8jVBjJ
-    certPath: cert/appCertPublicKey_2021006101678499.crt
-    alipayPublicCertPath: cert/alipayCertPublicKey_RSA2.crt
-    rootCertPath: cert/alipayRootCert.crt
+wx:
+  pay:
+    merchant-id: 1900006XXX          # 替换为实际商户号
+    app-id: wxd678efh567hg6787       # 替换为实际APPID
+    private-key-path: classpath:/cert/apiclient_key.pem  # 私钥文件路径
+    merchant-serial-number: 5157F09EFDC096DE15EBE81A47057A7232F1B8E1  # 证书序列号
+    api-v3-key: your-api-v3-key-here  # 替换为实际APIv3密钥
+    notify-url: https://your-domain.com/api/pay/notify  # 回调通知地址
+    return-url: https://your-domain.com/pay/success     # 支付成功跳转地址
+ali:
+  pay:
+    app-id: 9021000157611719
+    productCode: FACE_TO_FACE_PAYMENT
+    public-key:
+    private-key: MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQC6N7+azBWGP7/yMJey3lphsmP8GjW3RFQrOvuV3CQFYld/EbRrvwQEkyIPAxYA3H1+WgctGwu5CbmcKTPbXlYpDcnzNGh2akn0cITaFOFQwQuzHCe4k93rIJtrNDgwgTD9zFrLKoIKUQ0DOhQfTA88kY3cdgSkKJoEqdkNDwCgPeN/2H9I08w2ZKboEpMzrtLEQgHPsIBa7ZwM9KrHd9IpSGYr8iD6+HzpWVROb7QuH8FutYKDT/ekBE17RR+vCalFs0Xa67JuD8zuyrjW4jNqoOcb6jN4n7VOlcoKtAewUmPWYrjWz3aqFclHwQSxCHGMFhQakl1SC5t3bobn8/BDAgMBAAECggEAZ34qP9bis4zkma6F8MQBCUECro7Ggcc43BnYzw3c+x0PsbBeTG+JxR0clalKZkokeL+CM4BPgJQ2EuMXTfjc+84NCdx7niwuU+rg+u8V1jKj1PR14vBTKqUhm3AXNmXmm3cikr1aLm+jQsLZghdcdHYUmI0CwVVLXAIlfktzNpqbuB4d2rq6i13txWTrEqOLemhZXcPVBmKtIgfChR9z3pv2QMPNMBUKyzp2iK9tb+1Duw1FC9mlE4GpqeCUmHZMe6TST9HLH4vH2joui6RxXJkMFbZQYuLHgU0/+TeiF0VDHN+AUowjwncLe6DmzzvQ6gMI9TNXoW2bXbV9scMuMQKBgQDmNCVKYPWE0CY5HyKmnjkNNfAfq7G0A1Z1xqiuTJvcfFL2h8VSkSDLv+Vx2vM2+apzRzB6ZKZKmNgz9ZB584o5eCW88UMbEx7W3cv4a5z07ELR8NuoHTL7jloGuaNqIHFZmY6V4lRopZ9vfRUEvwfV07jSotVQpf9/jwvN0vaMiQKBgQDPFcdAkTA6xoY5acCHC7tTPowb+HPC6lWHDWw45BORxY9MbFxyLAEDfDKcwVWicIaupZOGGvJmj349qownGWK2JuBS+nS8NBL9kqLTv6tKj7JtXvBHYgJfzJzGmH+iyrvD2JHHYxQMr05aDdVxpRPqI35RcSEqPiBjRCMTq77bawKBgQDCuSFCBTopGhj7AIdDAVuo/RMc9xLd/mTIQz60EUFWBCP5PWeALBrdvnjLEjXhLtcro/Ax16mCOD/J09JeFc+6RRNG+52T7VyMzBiZDg46bw8mnuJvFiPl/cfRIH5GayL2c5nU1xonWtG+cMOyvBRYnzsbkXl3OrMgp1OIywaaYQKBgGL4y6QGQAC3RQtHiaaBauQcLqZnlhwAFyRWu/RsvRWcUCJ8X6qJcWqS/zWACUd7dEMgC2O6mUN/LRyX2CgPr+fSqL+/x+7zDGh4nq2JG3qlNueiyj+zjeLvTbZ0x/ur3RV6+iFLLxfo6Q+NMQgBl4T9ta+C3BDuZFhNBl6uZKdFAoGAE8y1/3FNJLfEw3V/6YsHz6x4sfEQrixNv0mYV1wye8Le26GUVVvk9JLldQ7Spn9NkdFJS8dDXtgDRFg3kk7xoEhoy8+kXLs2Mba+BEFmh+pzAdgdx9r807hgIdMTbi/eYQU668OsE713FhkkJVzNfULxB9tYzSdbeYpbmluMD8A=
+    cert-path: /cert/ali/test/appPublicCert.crt
+    ali-pay-public-cert-path: /cert/ali/test/alipayPublicCert.crt
+    root-cert-path: /cert/ali/test/alipayRootCert.crt
+    server-url: https://openapi-sandbox.dl.alipaydev.com/gateway.do
+    notify-url: https://dev.bole.hioas.com/api/v1/ali/pay/notify  # 回调通知地址
+    return-url: https://your-domain.com/pay/success     # 支付成功跳转地址
 
 ---
 #开发环境
