@@ -37,7 +37,7 @@ public class AliPayBizImpl implements AliPayBiz {
             model.setTotalAmount(qrCodeRequest.getTotalAmount().toString());
             model.setSubject(qrCodeRequest.getSubject());
             model.setTimeoutExpress(qrCodeRequest.getTimeoutExpress());
-            model.setProductCode("QR_CODE_OFFLINE");
+            model.setProductCode(aliPayProperties.getProductCode());
 
             AlipayTradePrecreateRequest request = new AlipayTradePrecreateRequest();
             request.setNotifyUrl(aliPayProperties.getNotifyUrl());

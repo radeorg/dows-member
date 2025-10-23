@@ -45,4 +45,6 @@ public class AliPayProperties {
 
     /** 生成签名字符串所使用的签名算法类型，目前支持 RSA2 算法。 */
     private String signType = "RSA2";
+    /**沙箱 FACE_TO_FACE_PAYMENT 正式QR_CODE_OFFLINE*/
+    private String productCode;
 }
