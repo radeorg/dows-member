@@ -22,21 +22,21 @@ public class AliPayConfig {
         String certPath = aliPayProperties.getCertPath();
         if(certPath.startsWith("classpath:")){
             certPath = new ClassPathResource(aliPayProperties.getCertPath()).getURL().getPath();
-        }else if(certPath.startsWith("file:")){
-            certPath = new FileSystemResource(certPath).getURL().getPath();
+        }else if(certPath.startsWith("http:")){
+            // todo http 方式获取
         }
         String rootCertPath = aliPayProperties.getRootCertPath();
         if(rootCertPath.startsWith("classpath:")){
-            rootCertPath= new ClassPathResource(aliPayProperties.getRootCertPath()).getURL().getPath();
-        }else if(rootCertPath.startsWith("file:")){
-            rootCertPath= new FileSystemResource(aliPayProperties.getRootCertPath()).getURL().getPath();;
+            rootCertPath= new ClassPathResource(rootCertPath).getURL().getPath();
+        }else if(rootCertPath.startsWith("http:")){
+            // todo http 方式获取
         }
 
         String aliPayPublicCertPath = aliPayProperties.getAliPayPublicCertPath();
         if(aliPayPublicCertPath.startsWith("classpath:")){
-            aliPayPublicCertPath = new ClassPathResource(aliPayProperties.getAliPayPublicCertPath()).getURI().getPath();
-        }else if(aliPayPublicCertPath.startsWith("file:")){
-            rootCertPath= new FileSystemResource(aliPayPublicCertPath).getURL().getPath();;
+            aliPayPublicCertPath = new ClassPathResource(aliPayPublicCertPath).getURI().getPath();
+        }else if(aliPayPublicCertPath.startsWith("http:")){
+            // todo http 方式获取
         }
         CertAlipayRequest certRequest = new CertAlipayRequest();
         certRequest.setServerUrl(aliPayProperties.getServerUrl());
