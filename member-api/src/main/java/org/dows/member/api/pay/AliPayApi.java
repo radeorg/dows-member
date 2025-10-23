@@ -6,10 +6,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.dows.member.request.pay.PayQrCodeRequest;
 import org.dows.member.response.pay.AliPayStatusResponse;
 import org.dows.member.response.pay.PayQrCodeResponse;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 @Tag(name = "支付宝支付", description = "支付宝支付")
 @RequestMapping("/v1/ali/pay")
@@ -23,7 +20,7 @@ public interface AliPayApi {
     @Operation(summary = "支付结果回调处理")
     String aliPayNotify(HttpServletRequest request);
 
-    @PostMapping("/queryStatus")
+    @GetMapping("/queryStatus")
     @Operation(summary = "查询订单状态接口")
     AliPayStatusResponse aliPayStatus(@RequestParam("outTradeNo") String outTradeNo);
 }

@@ -11,6 +11,7 @@ import com.alipay.api.response.AlipayTradePrecreateResponse;
 import com.alipay.api.response.AlipayTradeQueryResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.dows.member.enums.MemberChargeStateEnum;
 import org.dows.member.exception.MemberException;
 import org.dows.member.handler.config.AliPayProperties;
 import org.dows.member.handler.pay.AliPayBiz;
@@ -86,7 +87,7 @@ public class AliPayBizImpl implements AliPayBiz {
         request.setBizModel(model);
 
         try {
-            AlipayTradeQueryResponse response = alipayClient.execute(request);
+            AlipayTradeQueryResponse response = alipayClient.certificateExecute(request);
             if (response.isSuccess()) {
                 queryResponse.setOutTradeNo(outTradeNo);
                 queryResponse.setTradeNo(response.getTradeNo());
@@ -95,6 +96,7 @@ public class AliPayBizImpl implements AliPayBiz {
                 queryResponse.setTotalAmount(response.getTotalAmount());
                 queryResponse.setSuccess(true);
             } else {
+                queryResponse.setTradeState(MemberChargeStateEnum.FAILED.getCode());
                 queryResponse.setSuccess(false);
                 queryResponse.setMessage(response.getMsg());
             }
