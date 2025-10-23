@@ -9,6 +9,7 @@ import org.dows.member.request.user.UserMemberChargeSaveRequest;
 import org.dows.member.service.MemberChargeService;
 import org.springframework.stereotype.Component;
 
+import java.util.Date;
 import java.util.List;
 
 @Component
@@ -47,6 +48,7 @@ public class UserMemberChargeHandlerImpl implements UserMemberChargeHandler {
         MemberChargeEntity memberChargeEntity = new MemberChargeEntity();
         memberChargeEntity.setMemberChargeId(memberChargeId);
         memberChargeEntity.setState(state);
+        memberChargeEntity.setUt(new Date());
         return  memberChargeService.update(memberChargeEntity);
     }
 }
