@@ -1,10 +1,13 @@
 package org.dows.member.handler.config;
 
-import cn.hutool.core.io.resource.ClassPathResource;
 import com.alipay.api.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.FileSystemResource;
+
+import java.io.IOException;
 
 @Configuration
 @RequiredArgsConstructor
@@ -14,11 +17,27 @@ public class AliPayConfig {
 
     // 证书模式
     @Bean
-    public AlipayClient aliPayClient()  {
-//        ClassPathResource certPath = new ClassPathResource(aliPayProperties.getCertPath());
-//        ClassPathResource publicCertPath = new ClassPathResource(aliPayProperties.getAliPayPublicCertPath());
-//        ClassPathResource rootCertPath = new ClassPathResource(aliPayProperties.getRootCertPath());
+    public AlipayClient aliPayClient() throws IOException {
 
+        String certPath = aliPayProperties.getCertPath();
+        if(certPath.startsWith("classpath:")){
+            certPath = new ClassPathResource(aliPayProperties.getCertPath()).getURL().getPath();
+        }else if(certPath.startsWith("file:")){
+            certPath = new FileSystemResource(certPath).getURL().getPath();
+        }
+        String rootCertPath = aliPayProperties.getRootCertPath();
+        if(rootCertPath.startsWith("classpath:")){
+            rootCertPath= new ClassPathResource(aliPayProperties.getRootCertPath()).getURL().getPath();
+        }else if(rootCertPath.startsWith("file:")){
+            rootCertPath= new FileSystemResource(aliPayProperties.getRootCertPath()).getURL().getPath();;
+        }
+
+        String aliPayPublicCertPath = aliPayProperties.getAliPayPublicCertPath();
+        if(aliPayPublicCertPath.startsWith("classpath:")){
+            aliPayPublicCertPath = new ClassPathResource(aliPayProperties.getAliPayPublicCertPath()).getURI().getPath();
+        }else if(aliPayPublicCertPath.startsWith("file:")){
+            rootCertPath= new FileSystemResource(aliPayPublicCertPath).getURL().getPath();;
+        }
         CertAlipayRequest certRequest = new CertAlipayRequest();
         certRequest.setServerUrl(aliPayProperties.getServerUrl());
         certRequest.setAppId(aliPayProperties.getAppId());
@@ -26,12 +45,10 @@ public class AliPayConfig {
         certRequest.setFormat(aliPayProperties.getFormat());
         certRequest.setCharset(aliPayProperties.getCharset());
         certRequest.setSignType(aliPayProperties.getSignType());
-//        certRequest.setCertPath(certPath.getUrl().getPath());
-//        certRequest.setAlipayPublicCertPath(publicCertPath.getUrl().getPath());
-//        certRequest.setRootCertPath(rootCertPath.getUrl().getPath());
-        certRequest.setCertPath(aliPayProperties.getCertPath());
-        certRequest.setAlipayPublicCertPath(aliPayProperties.getAliPayPublicCertPath());
-        certRequest.setRootCertPath(aliPayProperties.getRootCertPath());
+
+        certRequest.setCertPath(certPath);
+        certRequest.setRootCertPath(rootCertPath);
+        certRequest.setAlipayPublicCertPath(aliPayPublicCertPath);
         AlipayClient alipayClient = null;
         try {
             alipayClient = new DefaultAlipayClient(certRequest);
