@@ -15,9 +15,9 @@ public class AliPayConfig {
     // 证书模式
     @Bean
     public AlipayClient aliPayClient()  {
-        ClassPathResource certPath = new ClassPathResource(aliPayProperties.getCertPath());
-        ClassPathResource publicCertPath = new ClassPathResource(aliPayProperties.getAliPayPublicCertPath());
-        ClassPathResource rootCertPath = new ClassPathResource(aliPayProperties.getRootCertPath());
+//        ClassPathResource certPath = new ClassPathResource(aliPayProperties.getCertPath());
+//        ClassPathResource publicCertPath = new ClassPathResource(aliPayProperties.getAliPayPublicCertPath());
+//        ClassPathResource rootCertPath = new ClassPathResource(aliPayProperties.getRootCertPath());
 
         CertAlipayRequest certRequest = new CertAlipayRequest();
         certRequest.setServerUrl(aliPayProperties.getServerUrl());
@@ -26,9 +26,12 @@ public class AliPayConfig {
         certRequest.setFormat(aliPayProperties.getFormat());
         certRequest.setCharset(aliPayProperties.getCharset());
         certRequest.setSignType(aliPayProperties.getSignType());
-        certRequest.setCertPath(certPath.getUrl().getPath());
-        certRequest.setAlipayPublicCertPath(publicCertPath.getUrl().getPath());
-        certRequest.setRootCertPath(rootCertPath.getUrl().getPath());
+//        certRequest.setCertPath(certPath.getUrl().getPath());
+//        certRequest.setAlipayPublicCertPath(publicCertPath.getUrl().getPath());
+//        certRequest.setRootCertPath(rootCertPath.getUrl().getPath());
+        certRequest.setCertPath(aliPayProperties.getCertPath());
+        certRequest.setAlipayPublicCertPath(aliPayProperties.getAliPayPublicCertPath());
+        certRequest.setRootCertPath(aliPayProperties.getRootCertPath());
         AlipayClient alipayClient = null;
         try {
             alipayClient = new DefaultAlipayClient(certRequest);

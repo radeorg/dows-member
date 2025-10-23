@@ -6,8 +6,11 @@ import org.dows.member.entity.MemberChargeEntity;
 import org.dows.member.enums.*;
 import org.dows.member.exception.MemberException;
 import org.dows.member.handler.user.UserMemberChargeBiz;
+import org.dows.member.handler.user.UserMemberChargeHandler;
 import org.dows.member.handler.user.UserMemberInstanceBiz;
+import org.dows.member.request.user.UserMemberChargeSaveRequest;
 import org.dows.member.request.user.UserMemberChargeUpdateRequest;
+import org.dows.member.response.MemberChargeGetResponse;
 import org.dows.member.service.MemberChargeService;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,6 +25,12 @@ public class UserMemberChargeBizImpl implements UserMemberChargeBiz {
 
     private final MemberChargeService memberChargeService;
     private final UserMemberInstanceBiz userMemberInstanceBiz;
+    private final UserMemberChargeHandler userMemberChargeHandler;
+
+    @Override
+    public MemberChargeGetResponse save(UserMemberChargeSaveRequest request) {
+        return userMemberChargeHandler.save(request);
+    }
 
     @Transactional
     @Override

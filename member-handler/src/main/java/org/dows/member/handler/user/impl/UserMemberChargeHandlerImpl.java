@@ -1,15 +1,16 @@
 package org.dows.member.handler.user.impl;
 
+import cn.hutool.core.bean.BeanUtil;
 import com.mybatisflex.core.query.QueryWrapper;
 import lombok.RequiredArgsConstructor;
 import org.dows.member.entity.MemberChargeEntity;
 import org.dows.member.enums.MemberChargeStateEnum;
 import org.dows.member.handler.user.UserMemberChargeHandler;
 import org.dows.member.request.user.UserMemberChargeSaveRequest;
+import org.dows.member.response.MemberChargeGetResponse;
 import org.dows.member.service.MemberChargeService;
 import org.springframework.stereotype.Component;
 
-import java.util.Date;
 import java.util.List;
 
 @Component
@@ -19,7 +20,7 @@ public class UserMemberChargeHandlerImpl implements UserMemberChargeHandler {
     private final MemberChargeService memberChargeService;
 
     @Override
-    public MemberChargeEntity save(UserMemberChargeSaveRequest request) {
+    public MemberChargeGetResponse save(UserMemberChargeSaveRequest request) {
         MemberChargeEntity entity = new MemberChargeEntity();
         entity.setAppId(request.getAppId());
         entity.setAccountInstanceId(request.getAccountInstanceId());
@@ -35,7 +36,7 @@ public class UserMemberChargeHandlerImpl implements UserMemberChargeHandler {
 
         memberChargeService.save(entity);
 
-        return entity;
+        return BeanUtil.copyProperties(entity, MemberChargeGetResponse.class);
     }
 
     @Override
@@ -48,7 +49,6 @@ public class UserMemberChargeHandlerImpl implements UserMemberChargeHandler {
         MemberChargeEntity memberChargeEntity = new MemberChargeEntity();
         memberChargeEntity.setMemberChargeId(memberChargeId);
         memberChargeEntity.setState(state);
-        memberChargeEntity.setUt(new Date());
         return  memberChargeService.update(memberChargeEntity);
     }
 }
