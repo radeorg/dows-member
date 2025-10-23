@@ -1,37 +1,42 @@
 package org.dows.member.handler.pay.impl;
 
+import cn.hutool.core.util.ObjectUtil;
 import com.mybatisflex.core.query.QueryWrapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.dows.member.constant.MemberExceptionStatusCode;
-import org.dows.member.entity.MemberChargeEntity;
 import org.dows.member.entity.MemberInstanceEntity;
 import org.dows.member.entity.MemberInterestsEntity;
+import org.dows.member.enums.AliPayStateEnum;
 import org.dows.member.enums.MemberChargeTypeEnum;
 import org.dows.member.enums.MemberTypeEnum;
 import org.dows.member.enums.PayChannelEnum;
 import org.dows.member.exception.MemberException;
 import org.dows.member.handler.pay.AliPayBiz;
 import org.dows.member.handler.pay.PaymentBiz;
-//import org.dows.member.handler.pay.WechatPayBiz;
-import org.dows.member.handler.user.UserMemberChargeHandler;
+import org.dows.member.handler.user.UserMemberChargeBiz;
 import org.dows.member.request.pay.AliPayQrCodeRequest;
 import org.dows.member.request.pay.PayQrCodeRequest;
 import org.dows.member.request.pay.WechatPayQrCodeRequest;
 import org.dows.member.request.user.UserMemberChargeSaveRequest;
+import org.dows.member.request.user.UserMemberChargeUpdateRequest;
+import org.dows.member.response.MemberChargeGetResponse;
 import org.dows.member.response.pay.PayQrCodeResponse;
 import org.dows.member.service.MemberInstanceService;
 import org.dows.member.service.MemberInterestsService;
 import org.springframework.stereotype.Component;
 
+import java.util.Map;
 import java.util.Objects;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class PaymentBizImpl implements PaymentBiz {
 
     private final MemberInstanceService memberInstanceService;
     private final MemberInterestsService memberInterestsService;
-    private final UserMemberChargeHandler userMemberChargeHandler;
+    private final UserMemberChargeBiz userMemberChargeBiz;
 //    private final WechatPayBiz wechatPayBiz;
     private final AliPayBiz aliPayBiz;
 
@@ -53,11 +58,11 @@ public class PaymentBizImpl implements PaymentBiz {
         String chargeType = validateMemberInterest(oldInstance, interests, request);
 
         // 保存充值记录（充值订单）
-        MemberChargeEntity chargeEntity = saveMemberCharge(oldInstance,
+        MemberChargeGetResponse chargeEntity = saveMemberCharge(oldInstance,
                 interests,
                 request.getPayChannel(),
                 chargeType,
-                MemberChargeTypeEnum.getDescByCode(chargeType));
+                MemberChargeTypeEnum.getDescByCode(chargeType) + "(" + chargeType + ")");
 
         // 调用第三方支付
         if (request.getPayChannel().equals(PayChannelEnum.WECHAT.getCode())) {
@@ -78,11 +83,40 @@ public class PaymentBizImpl implements PaymentBiz {
         return null;
     }
 
-    private MemberChargeEntity saveMemberCharge(MemberInstanceEntity instance,
-                                                MemberInterestsEntity interests,
-                                                String channel,
-                                                String chargeType,
-                                                String note) {
+    @Override
+    public String aliPayNotify(Map<String, String> params) {
+        log.info("收到支付宝回调通知: {}", params);
+
+        // 验证回调签名
+        if (!aliPayBiz.verifyNotify(params)) {
+            log.warn("回调签名验证失败");
+            return "fail";
+        }
+
+        // 处理订单逻辑
+        String outTradeNo = params.get("out_trade_no");
+        String tradeStatus = params.get("trade_status");
+        String tradeNo = params.get("trade_no");
+
+        if (AliPayStateEnum.TRADE_SUCCESS.getCode().equals(tradeStatus)) {
+            log.info("订单支付成功，商户订单号: {}", outTradeNo);
+
+            UserMemberChargeUpdateRequest chargeUpdateRequest = new UserMemberChargeUpdateRequest();
+            chargeUpdateRequest.setMemberChargeId(ObjectUtil.isEmpty(outTradeNo) ? Long.parseLong(outTradeNo) : 0L);
+            chargeUpdateRequest.setState(tradeStatus);
+            chargeUpdateRequest.setTransactionId(tradeNo);
+
+            userMemberChargeBiz.update(chargeUpdateRequest);
+        }
+
+        return "success";
+    }
+
+    private MemberChargeGetResponse saveMemberCharge(MemberInstanceEntity instance,
+                                                     MemberInterestsEntity interests,
+                                                     String channel,
+                                                     String chargeType,
+                                                     String note) {
         UserMemberChargeSaveRequest request = new UserMemberChargeSaveRequest();
         request.setAppId(instance.getAppId());
         request.setAccountInstanceId(instance.getAccountInstanceId());
@@ -93,7 +127,7 @@ public class PaymentBizImpl implements PaymentBiz {
         request.setNote(note);
         request.setChargeType(chargeType);
 
-        return userMemberChargeHandler.save(request);
+        return userMemberChargeBiz.save(request);
     }
 
     private String validateMemberInterest(MemberInstanceEntity oldInstance,
