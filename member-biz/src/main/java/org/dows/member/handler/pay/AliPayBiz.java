@@ -1,5 +1,6 @@
 package org.dows.member.handler.pay;
 
+import com.alipay.api.AlipayApiException;
 import org.dows.member.request.pay.AliPayQrCodeRequest;
 import org.dows.member.response.pay.AliPayStatusResponse;
 import org.dows.member.response.pay.PayQrCodeResponse;
@@ -26,4 +27,9 @@ public interface AliPayBiz {
      * TRADE_FINISHED(交易结束，不可退款)
      */
     AliPayStatusResponse aliPayStatus(String outTradeNo);
+
+    /**
+     * 取消支付
+     */
+    void cancelPay(String outTradeNo) throws AlipayApiException;
 }

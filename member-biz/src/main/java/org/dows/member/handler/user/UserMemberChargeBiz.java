@@ -9,4 +9,6 @@ public interface UserMemberChargeBiz {
     MemberChargeGetResponse save(UserMemberChargeSaveRequest request);
 
     void update(UserMemberChargeUpdateRequest request);
+
+    void close(String payNo);
 }

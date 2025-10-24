@@ -1,6 +1,5 @@
 package org.dows.member.handler.pay.impl;
 
-import cn.hutool.core.util.ObjectUtil;
 import com.alibaba.fastjson.JSON;
 import com.mybatisflex.core.query.QueryWrapper;
 import lombok.RequiredArgsConstructor;
@@ -13,6 +12,7 @@ import org.dows.member.enums.MemberChargeTypeEnum;
 import org.dows.member.enums.MemberTypeEnum;
 import org.dows.member.enums.PayChannelEnum;
 import org.dows.member.exception.MemberException;
+import org.dows.member.handler.config.AliPayProperties;
 import org.dows.member.handler.pay.AliPayBiz;
 import org.dows.member.handler.pay.PaymentBiz;
 import org.dows.member.handler.user.UserMemberChargeBiz;
@@ -22,14 +22,22 @@ import org.dows.member.request.pay.WechatPayQrCodeRequest;
 import org.dows.member.request.user.UserMemberChargeSaveRequest;
 import org.dows.member.request.user.UserMemberChargeUpdateRequest;
 import org.dows.member.response.MemberChargeGetResponse;
+import org.dows.member.response.pay.AliPayStatusResponse;
 import org.dows.member.response.pay.PayQrCodeResponse;
 import org.dows.member.service.MemberInstanceService;
 import org.dows.member.service.MemberInterestsService;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 @Slf4j
 @Component
@@ -41,6 +49,11 @@ public class PaymentBizImpl implements PaymentBiz {
     private final UserMemberChargeBiz userMemberChargeBiz;
 //    private final WechatPayBiz wechatPayBiz;
     private final AliPayBiz aliPayBiz;
+    private final AliPayProperties aliPayProperties;
+    private final SimpMessagingTemplate messagingTemplate;
+    // 轮询线程池
+    private final ScheduledExecutorService pollingExecutor = Executors.newScheduledThreadPool(5);
+    private final ThreadPoolTaskExecutor aliPayPollingTask;
 
     @Transactional
     @Override
@@ -82,7 +95,12 @@ public class PaymentBizImpl implements PaymentBiz {
             payQrCodeRequest.setTotalAmount(interests.getAmount());
             payQrCodeRequest.setSubject(chargeEntity.getNote());
 
-            return aliPayBiz.aliPayQrCode(payQrCodeRequest);
+            PayQrCodeResponse response = aliPayBiz.aliPayQrCode(payQrCodeRequest);
+
+            // 发起轮询
+            startPaymentPolling(response.getOutTradeNo());
+
+            return response;
         }
         return null;
     }
@@ -105,15 +123,25 @@ public class PaymentBizImpl implements PaymentBiz {
         if (AliPayStateEnum.TRADE_SUCCESS.getCode().equals(tradeStatus)) {
             log.info("订单支付成功，商户订单号: {}", outTradeNo);
 
-            UserMemberChargeUpdateRequest chargeUpdateRequest = new UserMemberChargeUpdateRequest();
-            chargeUpdateRequest.setMemberChargeId(ObjectUtil.isEmpty(outTradeNo) ? Long.parseLong(outTradeNo) : 0L);
-            chargeUpdateRequest.setState(tradeStatus);
-            chargeUpdateRequest.setTransactionId(tradeNo);
+            AliPayStatusResponse orderStatus = aliPayStatus(outTradeNo);
 
-            userMemberChargeBiz.update(chargeUpdateRequest);
+            sendPaymentSuccessNotification(outTradeNo, orderStatus);
         }
 
         return "success";
+    }
+
+    @Override
+    public AliPayStatusResponse aliPayStatus(String outTradeNo) {
+        AliPayStatusResponse orderStatus = aliPayBiz.aliPayStatus(outTradeNo);
+
+        UserMemberChargeUpdateRequest chargeUpdateRequest = new UserMemberChargeUpdateRequest();
+        chargeUpdateRequest.setPayNo(outTradeNo);
+        chargeUpdateRequest.setState(orderStatus.getTradeState());
+        chargeUpdateRequest.setTransactionId(orderStatus.getTradeNo());
+        userMemberChargeBiz.update(chargeUpdateRequest);
+
+        return orderStatus;
     }
 
     private MemberChargeGetResponse saveMemberCharge(MemberInstanceEntity instance,
@@ -183,6 +211,142 @@ public class PaymentBizImpl implements PaymentBiz {
     private void checkMemberInterestsState(MemberInterestsEntity interests){
         if (interests.getState() == 1) {
             throw new MemberException(MemberExceptionStatusCode.HAS_DISABLED);
+        }
+    }
+
+    /**
+     * 启动支付轮询
+     */
+    private void startPaymentPolling(String outTradeNo) {
+        CompletableFuture<AliPayStatusResponse> pollingFuture = startPaymentPolling(
+                outTradeNo,
+                aliPayProperties.getPollingMaxTimes(),
+                aliPayProperties.getPollingIntervalSeconds());
+
+        // 处理轮询结果
+        pollingFuture.whenComplete((orderStatus, throwable) -> {
+            if (throwable != null) {
+                log.error("支付轮询异常，订单号: {}", outTradeNo, throwable);
+            } else {
+                log.info("支付轮询完成，订单号: {}，状态: {}", outTradeNo, orderStatus.getTradeState());
+                // 推送结果给前端
+                sendPaymentSuccessNotification(outTradeNo, orderStatus);
+            }
+        });
+    }
+
+    /**
+     * 发送支付成功通知给前端
+     */
+    private void sendPaymentSuccessNotification(String outTradeNo, AliPayStatusResponse orderStatus) {
+        try {
+            Map<String, Object> message = new HashMap<>();
+            message.put("outTradeNo", outTradeNo);
+            message.put("tradeStatus", orderStatus.getTradeState());
+            message.put("totalAmount", orderStatus.getTotalAmount());
+
+            messagingTemplate.convertAndSend("/topic/ali/pay/" + outTradeNo, message);
+            log.info("已发送支付结果通知，订单号: {}", outTradeNo);
+        } catch (Exception e) {
+            log.error("发送支付通知失败", e);
+        }
+    }
+
+    /**
+     * 发起支付轮询
+     * @param outTradeNo 商户订单号
+     * @param maxPollingTimes 最大轮询次数
+     * @param intervalSeconds 轮询间隔秒数
+     * @return 支付结果异步Future
+     */
+    public CompletableFuture<AliPayStatusResponse> startPaymentPolling(String outTradeNo, int maxPollingTimes, int intervalSeconds) {
+        CompletableFuture<AliPayStatusResponse> future = new CompletableFuture<>();
+        // 沙箱环境使用默认初始延迟，否则使用传入的初始延迟
+        int actualInitialDelay = aliPayProperties.isSandBoxEnabled() ? aliPayProperties.getSandBoxInitialDelaySeconds() : intervalSeconds;
+
+        AliPayPollingTask task = new AliPayPollingTask(outTradeNo, maxPollingTimes, intervalSeconds, future);
+
+        // 延迟actualInitialDelay后开始第一次轮询
+        pollingExecutor.schedule(task, actualInitialDelay, TimeUnit.SECONDS);
+
+        return future;
+    }
+
+    /**
+     * 支付宝支付轮询任务
+     */
+    private class AliPayPollingTask implements Runnable {
+        private final String outTradeNo;
+        private final int maxPollingTimes;
+        private final int intervalSeconds;
+        private final CompletableFuture<AliPayStatusResponse> future;
+        private int currentPollingCount = 0;
+
+        public AliPayPollingTask(String outTradeNo,
+                                 int maxPollingTimes,
+                                 int intervalSeconds,
+                                 CompletableFuture<AliPayStatusResponse> future) {
+            this.outTradeNo = outTradeNo;
+            this.maxPollingTimes = maxPollingTimes;
+            this.intervalSeconds = intervalSeconds;
+            this.future = future;
+        }
+
+        @Override
+        public void run() {
+            currentPollingCount++;
+            log.info("开始第{}次轮询查询，订单号: {}", currentPollingCount, outTradeNo);
+
+            try {
+                AliPayStatusResponse response = aliPayStatus(outTradeNo);
+                String tradeStatus = response.getTradeState();
+
+                // 判断交易状态
+                if ("TRADE_SUCCESS".equals(tradeStatus)) {
+                    // 支付成功，完成Future
+                    future.complete(response);
+
+                    log.info("轮询查询到支付成功，订单号: {}", outTradeNo);
+                } else if ("TRADE_CLOSED".equals(tradeStatus) || "TRADE_FINISHED".equals(tradeStatus)) {
+                    // 交易已关闭或完成
+                    future.complete(response);
+
+                    log.info("轮询查询到交易已关闭/完成，订单号: {}", outTradeNo);
+                } else if ("WAIT_BUYER_PAY".equals(tradeStatus)) {
+                    // 等待买家付款
+                    if (currentPollingCount >= maxPollingTimes) {
+                        // 达到最大轮询次数，撤销交易
+                        log.warn("达到最大轮询次数，准备撤销交易，订单号: {}", outTradeNo);
+
+                        // TODO 达到最大轮询数是否要取消订单
+                        aliPayBiz.cancelPay(outTradeNo);
+                        userMemberChargeBiz.close(outTradeNo);
+
+                        response.setTradeState("TRADE_CANCELED");
+
+                        future.complete(response);
+                    } else {
+                        // 继续轮询
+                        log.info("等待买家付款，继续轮询，订单号: {}", outTradeNo);
+
+                        pollingExecutor.schedule(this, intervalSeconds, TimeUnit.SECONDS);
+                    }
+                } else {
+                    // 其他状态
+                    future.complete(response);
+
+                    log.info("轮询查询到其他状态: {}，订单号: {}", tradeStatus, outTradeNo);
+                }
+            } catch (Exception e) {
+                log.error("轮询查询异常，订单号: {}", outTradeNo, e);
+
+                if (currentPollingCount >= maxPollingTimes) {
+                    future.completeExceptionally(e);
+                } else {
+                    // 异常情况下仍继续轮询
+                    pollingExecutor.schedule(this, intervalSeconds, TimeUnit.SECONDS);
+                }
+            }
         }
     }
 }

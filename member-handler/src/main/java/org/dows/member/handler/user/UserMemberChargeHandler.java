@@ -16,10 +16,10 @@ public interface UserMemberChargeHandler {
     /**
      * 查询未支付的订单
      */
-    List<MemberChargeEntity> listNotPayMemberCharge();
+    List<MemberChargeEntity> listDuePayMemberCharge();
 
     /**
      * 修改未支付的订单状态
      */
-    boolean updateNotPayMemberCharge(Long memberChargeId,String state);
+    void updateNotPayMemberCharge(Long memberChargeId,String state);
 }

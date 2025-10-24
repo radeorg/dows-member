@@ -1,6 +1,7 @@
 package org.dows.member.handler.user.impl;
 
 import cn.hutool.core.util.ObjectUtil;
+import com.mybatisflex.core.query.QueryWrapper;
 import lombok.RequiredArgsConstructor;
 import org.dows.member.entity.MemberChargeEntity;
 import org.dows.member.enums.*;
@@ -35,25 +36,37 @@ public class UserMemberChargeBizImpl implements UserMemberChargeBiz {
     @Transactional
     @Override
     public void update(UserMemberChargeUpdateRequest request) {
-        MemberChargeEntity memberCharge = memberChargeService.getById(request.getMemberChargeId());
+        MemberChargeEntity memberCharge = getMemberChargeByPayNo(request.getPayNo());
         if (memberCharge == null) {
             throw new MemberException("未查询到对应充值记录");
         }
 
         String state = getChargeState(memberCharge, request.getState());
 
-        // 更新充值状态
-        memberCharge.setTransactionId(request.getTransactionId());
-        memberCharge.setChargeTime(payTimeToPareDate(request.getPayTime()));
-        memberCharge.setState(state);
-        memberChargeService.updateById(memberCharge);
+        if (!memberCharge.getState().equals(state)) {
+            // 更新充值状态
+            memberCharge.setTransactionId(request.getTransactionId());
+            memberCharge.setChargeTime(payTimeToPareDate(request.getPayTime()));
+            memberCharge.setState(state);
+            memberChargeService.updateById(memberCharge);
 
-        if (state.equals(MemberChargeStateEnum.SUCCESS.getCode())) {
-            if (memberCharge.getChargeType().equals(MemberChargeTypeEnum.RENEWAL.getCode())) {
-                userMemberInstanceBiz.renewal(memberCharge);
-            } else if (memberCharge.getChargeType().equals(MemberChargeTypeEnum.UP_GRADE.getCode())) {
-                userMemberInstanceBiz.upgrade(memberCharge);
+            if (state.equals(MemberChargeStateEnum.SUCCESS.getCode())) {
+                if (memberCharge.getChargeType().equals(MemberChargeTypeEnum.RENEWAL.getCode())) {
+                    userMemberInstanceBiz.renewal(memberCharge);
+                } else if (memberCharge.getChargeType().equals(MemberChargeTypeEnum.UP_GRADE.getCode())) {
+                    userMemberInstanceBiz.upgrade(memberCharge);
+                }
             }
+        }
+    }
+
+    @Override
+    public void close(String payNo) {
+        MemberChargeEntity entity = getMemberChargeByPayNo(payNo);
+        if (entity != null) {
+            entity.setState(MemberChargeStateEnum.CLOSED.getCode());
+
+            memberChargeService.updateById(entity);
         }
     }
 
@@ -81,5 +94,10 @@ public class UserMemberChargeBizImpl implements UserMemberChargeBiz {
             }
         }
         return entity.getState();
+    }
+
+    private MemberChargeEntity getMemberChargeByPayNo(String payNo) {
+        return memberChargeService.getOne(
+                QueryWrapper.create().eq(MemberChargeEntity::getPayNo, payNo));
     }
 }

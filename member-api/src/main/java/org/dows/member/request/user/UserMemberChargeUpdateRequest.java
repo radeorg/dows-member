@@ -7,8 +7,8 @@ import lombok.Data;
 @Schema(description = "更新充值记录请求")
 public class UserMemberChargeUpdateRequest {
 
-    @Schema(description = "充值记录ID")
-    private Long memberChargeId;
+    @Schema(description = "支付单号")
+    private String payNo;
 
     @Schema(description = "支付交易ID")
     private String transactionId;

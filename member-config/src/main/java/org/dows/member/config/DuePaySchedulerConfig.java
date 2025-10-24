@@ -5,16 +5,16 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 
 /**
- * 会员到期任务调度器配置
+ * 到期未付款充值任务调度器配置
  */
 @Configuration
-public class DueMemberSchedulerConfig {
+public class DuePaySchedulerConfig {
 
     @Bean
-    public ThreadPoolTaskScheduler dueMemberTaskScheduler() {
+    public ThreadPoolTaskScheduler duePayTaskScheduler() {
         ThreadPoolTaskScheduler scheduler = new ThreadPoolTaskScheduler();
         scheduler.setPoolSize(5);
-        scheduler.setThreadNamePrefix("DueMemberTaskScheduler-");
+        scheduler.setThreadNamePrefix("DuePayTaskScheduler-");
         scheduler.setWaitForTasksToCompleteOnShutdown(true);
         scheduler.setAwaitTerminationSeconds(60);
 
@@ -22,7 +22,7 @@ public class DueMemberSchedulerConfig {
         try {
             scheduler.initialize();
         } catch (Exception e) {
-            throw new IllegalStateException("Failed to initialize DueMemberTaskScheduler", e);
+            throw new IllegalStateException("Failed to initialize duePayTaskScheduler", e);
         }
         return scheduler;
     }

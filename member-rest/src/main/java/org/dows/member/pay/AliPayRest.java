@@ -7,7 +7,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.dows.member.api.pay.AliPayApi;
 import org.dows.member.enums.PayChannelEnum;
 import org.dows.member.exception.MemberException;
-import org.dows.member.handler.pay.AliPayBiz;
 import org.dows.member.handler.pay.PaymentBiz;
 import org.dows.member.request.pay.PayQrCodeRequest;
 import org.dows.member.response.pay.AliPayStatusResponse;
@@ -29,7 +28,6 @@ public class AliPayRest implements AliPayApi {
 
     private final AacContext aacContext;
     private final PaymentBiz paymentBiz;
-    private final AliPayBiz aliPayBiz;
 
     @Override
     public PayQrCodeResponse aliPayQrCode(PayQrCodeRequest request) {
@@ -50,7 +48,7 @@ public class AliPayRest implements AliPayApi {
 
     @Override
     public AliPayStatusResponse aliPayStatus(String outTradeNo) {
-        return aliPayBiz.aliPayStatus(outTradeNo);
+        return paymentBiz.aliPayStatus(outTradeNo);
     }
 
     private Long getAccountId() {
@@ -60,4 +58,5 @@ public class AliPayRest implements AliPayApi {
         }
         return aacUser.getAccountId();
     }
+
 }

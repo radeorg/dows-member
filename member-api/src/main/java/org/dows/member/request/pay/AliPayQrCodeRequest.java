@@ -22,7 +22,4 @@ public class AliPayQrCodeRequest {
     @NotBlank(message = "商品标题不能为空")
     @Schema(description = "商品标题")
     private String subject;
-
-    @Schema(description = "过期时间")
-    private String timeoutExpress = "30m";
 }

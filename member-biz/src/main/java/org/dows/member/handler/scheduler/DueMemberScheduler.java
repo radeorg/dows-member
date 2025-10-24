@@ -3,6 +3,7 @@ package org.dows.member.handler.scheduler;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.dows.member.enums.PayChannelEnum;
 import org.dows.member.handler.user.UserMemberInstanceBiz;
 import org.dows.member.handler.user.UserMemberInstanceHandler;
 import org.dows.member.response.MemberInstanceGetResponse;
@@ -39,13 +40,11 @@ public class DueMemberScheduler {
             List<MemberInstanceGetResponse> members = userMemberInstanceHandler.listDueMemberInstance();
             if (members.isEmpty()) return;
 
-            long count = members.stream()
-                    .peek(m -> {
-                        try { userMemberInstanceBiz.due(m.getMemberInstanceId()); }
-                        catch (Exception e) { log.error("处理失败：{}", m.getMemberInstanceId(), e); }
-                    })
-                    .count();
-            log.info("处理完成：{}条记录", count);
+            members.forEach(m -> {
+                userMemberInstanceBiz.due(m.getMemberInstanceId());
+            });
+
+            log.info("处理完成过期会员：{}条记录", members.size());
         } catch (Exception e) {
             log.error("处理异常", e);
         }

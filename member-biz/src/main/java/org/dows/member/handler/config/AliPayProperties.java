@@ -2,6 +2,7 @@ package org.dows.member.handler.config;
 
 import lombok.Data;
 //import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
@@ -45,6 +46,26 @@ public class AliPayProperties {
 
     /** 生成签名字符串所使用的签名算法类型，目前支持 RSA2 算法。 */
     private String signType = "RSA2";
+
     /**沙箱 FACE_TO_FACE_PAYMENT 正式QR_CODE_OFFLINE*/
     private String productCode;
+
+    /** 二维码过期时间，单位：分钟，超出时间为支付自动关闭订单 */
+    private String timeout;
+
+    /** 支付轮询最大次数 */
+    @Value("${ali.pay.polling.max-times}")
+    private int pollingMaxTimes;
+
+    /** 默认轮询间隔时间 */
+    @Value("${ali.pay.polling.interval-seconds}")
+    private int pollingIntervalSeconds;
+
+    /** 首次轮询延迟秒数（给订单创建留时间） */
+    @Value("${ali.pay.sandbox.initial-delay-seconds}")
+    private int sandBoxInitialDelaySeconds;
+
+    /** 是否启用沙箱环境适配（true/false） */
+    @Value("${ali.pay.sandbox.enabled}")
+    private boolean sandBoxEnabled;
 }

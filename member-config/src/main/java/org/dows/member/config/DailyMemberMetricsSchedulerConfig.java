@@ -24,7 +24,7 @@ public class DailyMemberMetricsSchedulerConfig {
         try {
             scheduler.initialize();
         } catch (Exception e) {
-            throw new IllegalStateException("Failed to initialize DueMemberScheduler", e);
+            throw new IllegalStateException("Failed to initialize DailyMemberMetricsTaskScheduler", e);
         }
         return scheduler;
     }

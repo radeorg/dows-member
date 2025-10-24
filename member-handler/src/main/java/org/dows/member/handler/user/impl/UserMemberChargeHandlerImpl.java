@@ -11,6 +11,7 @@ import org.dows.member.response.MemberChargeGetResponse;
 import org.dows.member.service.MemberChargeService;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Component
@@ -40,15 +41,23 @@ public class UserMemberChargeHandlerImpl implements UserMemberChargeHandler {
     }
 
     @Override
-    public List<MemberChargeEntity> listNotPayMemberCharge() {
-        return memberChargeService.list(QueryWrapper.create().eq(MemberChargeEntity::getState, MemberChargeStateEnum.WAIT_PAY.getCode()));
+    public List<MemberChargeEntity> listDuePayMemberCharge() {
+        // 获取当前时间
+        LocalDateTime now = LocalDateTime.now();
+        // 减去15分钟
+        LocalDateTime fifteenMinutesAgo = now.minusMinutes(15);
+
+        // 查询小于等于15分钟还未支付的订单
+        return memberChargeService.list(QueryWrapper.create()
+                .eq(MemberChargeEntity::getState, MemberChargeStateEnum.WAIT_PAY.getCode())
+                .le(MemberChargeEntity::getTs, fifteenMinutesAgo));
     }
 
     @Override
-    public boolean updateNotPayMemberCharge(Long memberChargeId,String state) {
+    public void updateNotPayMemberCharge(Long memberChargeId,String state) {
         MemberChargeEntity memberChargeEntity = new MemberChargeEntity();
         memberChargeEntity.setMemberChargeId(memberChargeId);
         memberChargeEntity.setState(state);
-        return  memberChargeService.update(memberChargeEntity);
+        memberChargeService.update(memberChargeEntity);
     }
 }

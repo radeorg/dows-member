@@ -1,6 +1,7 @@
 package org.dows.member.handler.pay;
 
 import org.dows.member.request.pay.PayQrCodeRequest;
+import org.dows.member.response.pay.AliPayStatusResponse;
 import org.dows.member.response.pay.PayQrCodeResponse;
 
 import java.util.Map;
@@ -20,4 +21,9 @@ public interface PaymentBiz {
      * 支付宝回调
      */
     String aliPayNotify(Map<String, String> params);
+
+    /**
+     * 查询支付宝支付状态
+     */
+    AliPayStatusResponse aliPayStatus(String outTradeNo);
 }

@@ -2,11 +2,14 @@ package org.dows.member.handler.pay.impl;
 
 import com.alipay.api.AlipayApiException;
 import com.alipay.api.AlipayClient;
+import com.alipay.api.domain.AlipayTradeCancelModel;
 import com.alipay.api.domain.AlipayTradePrecreateModel;
 import com.alipay.api.domain.AlipayTradeQueryModel;
 import com.alipay.api.internal.util.AlipaySignature;
+import com.alipay.api.request.AlipayTradeCancelRequest;
 import com.alipay.api.request.AlipayTradePrecreateRequest;
 import com.alipay.api.request.AlipayTradeQueryRequest;
+import com.alipay.api.response.AlipayTradeCancelResponse;
 import com.alipay.api.response.AlipayTradePrecreateResponse;
 import com.alipay.api.response.AlipayTradeQueryResponse;
 import lombok.RequiredArgsConstructor;
@@ -37,7 +40,7 @@ public class AliPayBizImpl implements AliPayBiz {
             model.setOutTradeNo(qrCodeRequest.getOutTradeNo());
             model.setTotalAmount(qrCodeRequest.getTotalAmount().toString());
             model.setSubject(qrCodeRequest.getSubject());
-            model.setTimeoutExpress(qrCodeRequest.getTimeoutExpress());
+            model.setTimeoutExpress(aliPayProperties.getTimeout());
             model.setProductCode(aliPayProperties.getProductCode());
 
             AlipayTradePrecreateRequest request = new AlipayTradePrecreateRequest();
@@ -106,5 +109,23 @@ public class AliPayBizImpl implements AliPayBiz {
             queryResponse.setMessage("系统错误: " + e.getMessage());
         }
         return queryResponse;
+    }
+
+    @Override
+    public void cancelPay(String outTradeNo) throws AlipayApiException {
+        // 构造请求参数以调用接口
+        AlipayTradeCancelModel model = new AlipayTradeCancelModel();
+        model.setOutTradeNo(outTradeNo);
+
+        AlipayTradeCancelRequest request = new AlipayTradeCancelRequest();
+        request.setBizModel(model);
+
+        AlipayTradeCancelResponse response = alipayClient.certificateExecute(request);
+        if (response.isSuccess()) {
+            log.info("订单撤销成功: {}", outTradeNo);
+        } else {
+            log.error("订单撤销失败: {}，错误信息: {}", outTradeNo, response.getMsg());
+            throw new AlipayApiException("订单撤销失败: " + response.getMsg());
+        }
     }
 }
