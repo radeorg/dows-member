@@ -1,6 +1,7 @@
 package org.dows.member.handler.pay.impl;
 
 import cn.hutool.core.util.ObjectUtil;
+import com.alibaba.fastjson.JSON;
 import com.mybatisflex.core.query.QueryWrapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -60,11 +61,12 @@ public class PaymentBizImpl implements PaymentBiz {
         String chargeType = validateMemberInterest(oldInstance, interests, request);
 
         // 保存充值记录（充值订单）
+        String memberType = MemberTypeEnum.getDescByCode(interests.getMemberType());
         MemberChargeGetResponse chargeEntity = saveMemberCharge(oldInstance,
                 interests,
                 request.getPayChannel(),
                 chargeType,
-                MemberChargeTypeEnum.getDescByCode(chargeType) + "(" + chargeType + ")");
+                MemberChargeTypeEnum.getDescByCode(chargeType) + "(" + memberType + ")");
 
         // 调用第三方支付
         if (request.getPayChannel().equals(PayChannelEnum.WECHAT.getCode())) {
@@ -87,7 +89,7 @@ public class PaymentBizImpl implements PaymentBiz {
 
     @Override
     public String aliPayNotify(Map<String, String> params) {
-        log.info("收到支付宝回调通知: {}", params);
+        log.info("收到支付宝回调通知: {}", JSON.toJSONString(params, true));
 
         // 验证回调签名
         if (!aliPayBiz.verifyNotify(params)) {

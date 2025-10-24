@@ -63,7 +63,7 @@ public class AliPayBizImpl implements AliPayBiz {
     @Override
     public boolean verifyNotify(Map<String, String> params) {
         try {
-            return AlipaySignature.rsaCheckV1(
+            return AlipaySignature.rsaCheckV2(
                     params,
                     aliPayProperties.getPublicKey(),
                     aliPayProperties.getCharset(),
