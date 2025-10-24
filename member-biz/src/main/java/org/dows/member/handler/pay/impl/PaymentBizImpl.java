@@ -25,6 +25,7 @@ import org.dows.member.response.pay.PayQrCodeResponse;
 import org.dows.member.service.MemberInstanceService;
 import org.dows.member.service.MemberInterestsService;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Map;
 import java.util.Objects;
@@ -40,6 +41,7 @@ public class PaymentBizImpl implements PaymentBiz {
 //    private final WechatPayBiz wechatPayBiz;
     private final AliPayBiz aliPayBiz;
 
+    @Transactional
     @Override
     public PayQrCodeResponse createNativePayment(PayQrCodeRequest request) {
         // 查询会员实例
