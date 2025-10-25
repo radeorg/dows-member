@@ -67,6 +67,12 @@ public class PaymentBizImpl implements PaymentBiz {
         // 校验会员实例是否存在
         isMemberInstanceExist(oldInstance);
 
+        // 查询是否还有待支付的充值记录，有的话则关闭
+        MemberChargeGetResponse chargeGetResponse = userMemberChargeBiz.getWaitPayByAccountInstanceId(request.getAccountInstanceId());
+        if (chargeGetResponse != null) {
+            cancelAliPay(chargeGetResponse.getPayNo());
+        }
+
         // 查询当前缴费的会员等级，并验证是否存在及状态是否正常
         MemberInterestsEntity interests = getMemberInterestsById(request.getMemberInterestsId());
 
@@ -132,6 +138,16 @@ public class PaymentBizImpl implements PaymentBiz {
     }
 
     @Override
+    public void cancelAliPay(String outTradeNo) {
+        try {
+            aliPayBiz.cancelPay(outTradeNo);
+            userMemberChargeBiz.close(outTradeNo);
+        } catch (Exception e) {
+            log.error("取消支付宝支付失败：" + e.getMessage());
+        }
+    }
+
+    @Override
     public AliPayStatusResponse aliPayStatus(String outTradeNo) {
         AliPayStatusResponse orderStatus = aliPayBiz.aliPayStatus(outTradeNo);
 
@@ -139,6 +155,7 @@ public class PaymentBizImpl implements PaymentBiz {
         chargeUpdateRequest.setPayNo(outTradeNo);
         chargeUpdateRequest.setState(orderStatus.getTradeState());
         chargeUpdateRequest.setTransactionId(orderStatus.getTradeNo());
+        chargeUpdateRequest.setPayTime(orderStatus.getSendPayDate());
         userMemberChargeBiz.update(chargeUpdateRequest);
 
         return orderStatus;
@@ -318,9 +335,8 @@ public class PaymentBizImpl implements PaymentBiz {
                         // 达到最大轮询次数，撤销交易
                         log.warn("达到最大轮询次数，准备撤销交易，订单号: {}", outTradeNo);
 
-                        // TODO 达到最大轮询数是否要取消订单
-                        aliPayBiz.cancelPay(outTradeNo);
-                        userMemberChargeBiz.close(outTradeNo);
+                        // 达到最大轮询数撤销交易
+                        cancelAliPay(outTradeNo);
 
                         response.setTradeState("TRADE_CANCELED");
 

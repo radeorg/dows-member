@@ -18,6 +18,7 @@ import org.dows.member.enums.MemberChargeStateEnum;
 import org.dows.member.exception.MemberException;
 import org.dows.member.handler.config.AliPayProperties;
 import org.dows.member.handler.pay.AliPayBiz;
+import org.dows.member.handler.utils.PaymentTimeConverter;
 import org.dows.member.request.pay.AliPayQrCodeRequest;
 import org.dows.member.response.pay.AliPayStatusResponse;
 import org.dows.member.response.pay.PayQrCodeResponse;
@@ -97,6 +98,7 @@ public class AliPayBizImpl implements AliPayBiz {
                 // 交易状态说明：WAIT_BUYER_PAY(待付款)、TRADE_SUCCESS(支付成功)、TRADE_CLOSED(交易关闭)等FAIL
                 queryResponse.setTradeState(response.getTradeStatus());
                 queryResponse.setTotalAmount(response.getTotalAmount());
+                queryResponse.setSendPayDate(PaymentTimeConverter.toLocalDateTime(response.getSendPayDate()));
                 queryResponse.setSuccess(true);
             } else {
                 queryResponse.setTradeState(MemberChargeStateEnum.FAILED.getCode());
@@ -125,7 +127,10 @@ public class AliPayBizImpl implements AliPayBiz {
             log.info("订单撤销成功: {}", outTradeNo);
         } else {
             log.error("订单撤销失败: {}，错误信息: {}", outTradeNo, response.getMsg());
-            throw new AlipayApiException("订单撤销失败: " + response.getMsg());
+
+            if (!"40004".equals(response.getCode()) && !"ACQ.TRADE_NOT_EXIST".equals(response.getSubCode())) {
+                throw new AlipayApiException("订单撤销失败: " + response.getMsg());
+            }
         }
     }
 }

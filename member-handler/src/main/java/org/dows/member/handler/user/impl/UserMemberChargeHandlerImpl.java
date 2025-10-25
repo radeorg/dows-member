@@ -44,20 +44,12 @@ public class UserMemberChargeHandlerImpl implements UserMemberChargeHandler {
     public List<MemberChargeEntity> listDuePayMemberCharge() {
         // 获取当前时间
         LocalDateTime now = LocalDateTime.now();
-        // 减去15分钟
-        LocalDateTime fifteenMinutesAgo = now.minusMinutes(15);
+        // 减去N分钟
+        LocalDateTime fifteenMinutesAgo = now.minusMinutes(2);
 
         // 查询小于等于15分钟还未支付的订单
         return memberChargeService.list(QueryWrapper.create()
                 .eq(MemberChargeEntity::getState, MemberChargeStateEnum.WAIT_PAY.getCode())
                 .le(MemberChargeEntity::getTs, fifteenMinutesAgo));
-    }
-
-    @Override
-    public void updateNotPayMemberCharge(Long memberChargeId,String state) {
-        MemberChargeEntity memberChargeEntity = new MemberChargeEntity();
-        memberChargeEntity.setMemberChargeId(memberChargeId);
-        memberChargeEntity.setState(state);
-        memberChargeService.update(memberChargeEntity);
     }
 }

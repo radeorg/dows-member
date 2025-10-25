@@ -58,5 +58,4 @@ public class AliPayRest implements AliPayApi {
         }
         return aacUser.getAccountId();
     }
-
 }

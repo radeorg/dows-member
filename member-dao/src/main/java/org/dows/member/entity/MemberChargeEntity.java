@@ -12,7 +12,7 @@ import org.dows.rade.crud.AutoFillDataListener;
 import org.dows.rade.crud.BaseEntity;
 
 import java.math.BigDecimal;
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
@@ -45,7 +45,7 @@ public class MemberChargeEntity extends BaseEntity<MemberChargeEntity> {
     private String state;
 
     @Column(value = "charge_time", comment = "实际充值时间")
-    private Date chargeTime;
+    private LocalDateTime chargeTime;
 
     @Column(value = "transaction_id", comment = "第三方支付交易号")
     private String transactionId;
@@ -69,8 +69,8 @@ public class MemberChargeEntity extends BaseEntity<MemberChargeEntity> {
     private Integer deleted;
 
     @Column(value = "ts", comment = "操作时间")
-    private Date ts;
+    private LocalDateTime ts;
 
     @Column(value = "ut", comment = "更新时间")
-    private Date ut;
+    private LocalDateTime ut;
 }

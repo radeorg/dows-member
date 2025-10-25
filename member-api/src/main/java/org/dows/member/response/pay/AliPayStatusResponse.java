@@ -3,6 +3,8 @@ package org.dows.member.response.pay;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
+import java.time.LocalDateTime;
+
 @Data
 @Schema(description = "支付宝订单状态查询请求")
 public class AliPayStatusResponse {
@@ -19,10 +21,12 @@ public class AliPayStatusResponse {
     @Schema(description = "支付金额")
     private String totalAmount;
 
+    @Schema(description = "本次交易打款给卖家的时间")
+    private LocalDateTime sendPayDate;
+
     @Schema(description = "信息")
     private String message;
 
     @Schema(description = "查询状态")
     private Boolean success;
-
 }

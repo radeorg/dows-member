@@ -18,8 +18,7 @@ import org.dows.member.service.MemberInterestsService;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.ZoneId;
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 @Component
@@ -124,7 +123,7 @@ public class UserMemberInstanceBizImpl implements UserMemberInstanceBiz {
         isMemberInstanceExist(oldInstance);
 
         // 校验是否已到期
-        if (oldInstance.getExpiryDate() == null || (new Date()).after(oldInstance.getExpiryDate())) {
+        if (oldInstance.getExpiryDate() == null || (LocalDateTime.now().isAfter(oldInstance.getExpiryDate()))) {
             // 查询免费会员权益并校验是否存在及状态是否正常
             MemberInterestsEntity interests = getMemberInterestsByMemberType(MemberTypeEnum.FREE.getCode());
 
@@ -148,7 +147,7 @@ public class UserMemberInstanceBizImpl implements UserMemberInstanceBiz {
         instanceEntity.setAppId(request.getAppId());
         instanceEntity.setMemberInterestsId(interests.getMemberInterestsId());
         instanceEntity.setMemberType(interests.getMemberType());
-        instanceEntity.setEffectiveDate(new Date());
+        instanceEntity.setEffectiveDate(LocalDateTime.now());
         memberInstanceService.save(instanceEntity);
 
         return instanceEntity;
@@ -161,12 +160,12 @@ public class UserMemberInstanceBizImpl implements UserMemberInstanceBiz {
         newInstance.setMemberInstanceId(oldInstance.getMemberInstanceId());
         newInstance.setMemberType(interests.getMemberType());
         newInstance.setMemberInterestsId(interests.getMemberInterestsId());
-        newInstance.setEffectiveDate(new Date());
+        newInstance.setEffectiveDate(LocalDateTime.now());
         newInstance.setExpiryDate(addDate(oldInstance.getExpiryDate(), interests.getExpiryDay()));
         newInstance.setOperatorId(0L);
         newInstance.setDeleted(oldInstance.getDeleted());
         newInstance.setTs(oldInstance.getTs());
-        newInstance.setUt(new Date());
+        newInstance.setUt(LocalDateTime.now());
 
         // 需要增加忽略空值参数，因为免费会员有效期为空代表永久
         memberInstanceService.updateById(newInstance, false);
@@ -223,16 +222,10 @@ public class UserMemberInstanceBizImpl implements UserMemberInstanceBiz {
         }
     }
 
-    private Date addDate(Date currentDate, Integer addDays){
-        if (addDays == null) {
+    private LocalDateTime addDate(LocalDateTime dateTime, Integer addDays){
+        if (dateTime == null) {
             return null;
         }
-        currentDate = currentDate == null ? new Date() : currentDate;
-        return Date.from(
-                currentDate.toInstant()
-                        .atZone(ZoneId.systemDefault())
-                        .plusDays(addDays)
-                        .toInstant()
-        );
+        return dateTime.plusDays(addDays);
     }
 }

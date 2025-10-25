@@ -1,5 +1,6 @@
 package org.dows.member.handler.pay;
 
+import com.alipay.api.AlipayApiException;
 import org.dows.member.request.pay.PayQrCodeRequest;
 import org.dows.member.response.pay.AliPayStatusResponse;
 import org.dows.member.response.pay.PayQrCodeResponse;
@@ -21,6 +22,11 @@ public interface PaymentBiz {
      * 支付宝回调
      */
     String aliPayNotify(Map<String, String> params);
+
+    /**
+     * 取消支付宝支付
+     */
+    void cancelAliPay(String outTradeNo) throws AlipayApiException;
 
     /**
      * 查询支付宝支付状态

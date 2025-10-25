@@ -1,6 +1,6 @@
 package org.dows.member.handler.user.impl;
 
-import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.core.bean.BeanUtil;
 import com.mybatisflex.core.query.QueryWrapper;
 import lombok.RequiredArgsConstructor;
 import org.dows.member.entity.MemberChargeEntity;
@@ -15,10 +15,6 @@ import org.dows.member.response.MemberChargeGetResponse;
 import org.dows.member.service.MemberChargeService;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.Date;
 
 @Component
 @RequiredArgsConstructor
@@ -46,7 +42,7 @@ public class UserMemberChargeBizImpl implements UserMemberChargeBiz {
         if (!memberCharge.getState().equals(state)) {
             // 更新充值状态
             memberCharge.setTransactionId(request.getTransactionId());
-            memberCharge.setChargeTime(payTimeToPareDate(request.getPayTime()));
+            memberCharge.setChargeTime(request.getPayTime());
             memberCharge.setState(state);
             memberChargeService.updateById(memberCharge);
 
@@ -70,13 +66,13 @@ public class UserMemberChargeBizImpl implements UserMemberChargeBiz {
         }
     }
 
-    private Date payTimeToPareDate(String successTime) {
-        if (ObjectUtil.isNotEmpty(successTime)) {
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssXXX");
-            ZonedDateTime zonedDateTime = ZonedDateTime.parse(successTime, formatter);
-            return Date.from(zonedDateTime.toInstant());
-        }
-        return null;
+    @Override
+    public MemberChargeGetResponse getWaitPayByAccountInstanceId(Long accountInstanceId) {
+        MemberChargeEntity entity = memberChargeService.getOne(QueryWrapper.create()
+                .eq(MemberChargeEntity::getAccountInstanceId, accountInstanceId)
+                .eq(MemberChargeEntity::getState, MemberChargeStateEnum.WAIT_PAY.getCode()));
+
+        return BeanUtil.copyProperties(entity, MemberChargeGetResponse.class);
     }
 
     private String getChargeState(MemberChargeEntity entity, String state) {

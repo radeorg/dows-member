@@ -11,4 +11,6 @@ public interface UserMemberChargeBiz {
     void update(UserMemberChargeUpdateRequest request);
 
     void close(String payNo);
+
+    MemberChargeGetResponse getWaitPayByAccountInstanceId(Long accountInstanceId);
 }

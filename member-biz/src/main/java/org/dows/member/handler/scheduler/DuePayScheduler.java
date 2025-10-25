@@ -1,5 +1,6 @@
 package org.dows.member.handler.scheduler;
 
+import com.alipay.api.AlipayApiException;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -37,12 +38,17 @@ public class DuePayScheduler {
 
     private void processDuePay() {
         try {
+            // 两分钟内未支付的订单进行撤销支付
             List<MemberChargeEntity> list = userMemberChargeHandler.listDuePayMemberCharge();
             if (list.isEmpty()) return;
 
             list.forEach(m -> {
                 if (m.getChannel().equals(PayChannelEnum.ALI.getCode())) {
-                    paymentBiz.aliPayStatus(m.getPayNo());
+                    try {
+                        paymentBiz.cancelAliPay(m.getPayNo());
+                    } catch (AlipayApiException e) {
+                        log.error("支付宝订单关闭失败：" + e.getErrMsg());
+                    }
                 } else if (m.getChannel().equals(PayChannelEnum.WECHAT.getCode())) {
 
                 }

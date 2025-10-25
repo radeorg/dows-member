@@ -11,7 +11,7 @@ import lombok.EqualsAndHashCode;
 import org.dows.rade.crud.AutoFillDataListener;
 import org.dows.rade.crud.BaseEntity;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
@@ -74,8 +74,8 @@ public class MemberMetricsEntity extends BaseEntity<MemberMetricsEntity> {
     private Integer deleted;
 
     @Column(value = "ts", comment = "操作时间")
-    private Date ts;
+    private LocalDateTime ts;
 
     @Column(value = "ut", comment = "更新时间")
-    private Date ut;
+    private LocalDateTime ut;
 }

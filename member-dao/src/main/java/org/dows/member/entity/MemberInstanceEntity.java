@@ -11,7 +11,7 @@ import lombok.EqualsAndHashCode;
 import org.dows.rade.crud.AutoFillDataListener;
 import org.dows.rade.crud.BaseEntity;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
@@ -32,10 +32,10 @@ public class MemberInstanceEntity extends BaseEntity<MemberInstanceEntity> {
     private String memberType;
 
     @Column(value = "effective_date", comment = "会员生效日期")
-    private Date effectiveDate;
+    private LocalDateTime effectiveDate;
 
     @Column(value = "expiry_date", comment = "会员过期日期")
-    private Date expiryDate;
+    private LocalDateTime expiryDate;
 
     @Column(value = "app_id", comment = "应用ID")
     private String appId;
@@ -50,8 +50,8 @@ public class MemberInstanceEntity extends BaseEntity<MemberInstanceEntity> {
     private Integer deleted;
 
     @Column(value = "ts", comment = "操作时间")
-    private Date ts;
+    private LocalDateTime ts;
 
     @Column(value = "ut", comment = "更新时间")
-    private Date ut;
+    private LocalDateTime ut;
 }

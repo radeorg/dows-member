@@ -12,7 +12,7 @@ import org.dows.rade.crud.AutoFillDataListener;
 import org.dows.rade.crud.BaseEntity;
 
 import java.math.BigDecimal;
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
@@ -74,8 +74,8 @@ public class MemberInterestsEntity extends BaseEntity<MemberInterestsEntity> {
     private Integer deleted;
 
     @Column(value = "ts", comment = "操作时间")
-    private Date ts;
+    private LocalDateTime ts;
 
     @Column(value = "ut", comment = "更新时间")
-    private Date ut;
+    private LocalDateTime ut;
 }
