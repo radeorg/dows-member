@@ -70,7 +70,11 @@ public class PaymentBizImpl implements PaymentBiz {
         // 查询是否还有待支付的充值记录，有的话则关闭
         MemberChargeGetResponse chargeGetResponse = userMemberChargeBiz.getWaitPayByAccountInstanceId(request.getAccountInstanceId());
         if (chargeGetResponse != null) {
-            cancelAliPay(chargeGetResponse.getPayNo());
+            if (chargeGetResponse.getChannel().equals(PayChannelEnum.WECHAT.getCode())) {
+                // TODO
+            } else if (chargeGetResponse.getChannel().equals(PayChannelEnum.ALI.getCode())){
+                cancelAliPay(chargeGetResponse.getPayNo());
+            }
         }
 
         // 查询当前缴费的会员等级，并验证是否存在及状态是否正常
@@ -124,7 +128,6 @@ public class PaymentBizImpl implements PaymentBiz {
         // 处理订单逻辑
         String outTradeNo = params.get("out_trade_no");
         String tradeStatus = params.get("trade_status");
-        String tradeNo = params.get("trade_no");
 
         if (AliPayStateEnum.TRADE_SUCCESS.getCode().equals(tradeStatus)) {
             log.info("订单支付成功，商户订单号: {}", outTradeNo);
