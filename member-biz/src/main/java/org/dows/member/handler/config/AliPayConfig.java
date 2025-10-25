@@ -15,6 +15,8 @@ public class AliPayConfig {
 
     private final static String HTTP_PRE = "http:";
     private final static String CLASSPATH_PRE = "classpath:";
+    // 缓存公钥内容，避免重复读取证书文件
+    private String alipayPublicKeyCache;
 
     private final AliPayProperties aliPayProperties;
 
@@ -43,6 +45,21 @@ public class AliPayConfig {
             throw new RuntimeException(e);
         }
         return  alipayClient;
+    }
+
+    /**
+     * 获取支付宝公钥（从证书中提取）
+     */
+    public String getAlipayPublicKey() {
+        // 缓存公钥内容，避免重复读取证书文件
+        if (alipayPublicKeyCache == null) {
+            synchronized (this) {
+                if (alipayPublicKeyCache == null) {
+                    alipayPublicKeyCache = resolvePath(aliPayProperties.getAliPayPublicCertPath());
+                }
+            }
+        }
+        return alipayPublicKeyCache;
     }
 
     /**

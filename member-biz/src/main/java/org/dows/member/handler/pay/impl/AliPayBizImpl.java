@@ -16,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.dows.member.enums.MemberChargeStateEnum;
 import org.dows.member.exception.MemberException;
+import org.dows.member.handler.config.AliPayConfig;
 import org.dows.member.handler.config.AliPayProperties;
 import org.dows.member.handler.pay.AliPayBiz;
 import org.dows.member.handler.utils.PaymentTimeConverter;
@@ -33,6 +34,7 @@ public class AliPayBizImpl implements AliPayBiz {
 
     private final AliPayProperties aliPayProperties;
     private final AlipayClient alipayClient;
+    private final AliPayConfig aliPayConfig;
 
     @Override
     public PayQrCodeResponse aliPayQrCode(AliPayQrCodeRequest qrCodeRequest) {
@@ -67,9 +69,13 @@ public class AliPayBizImpl implements AliPayBiz {
     @Override
     public boolean verifyNotify(Map<String, String> params) {
         try {
-            return AlipaySignature.rsaCheckV2(
+            // 使用与AlipayClient相同的证书源获取公钥
+            String alipayPublicKey = aliPayConfig.getAlipayPublicKey();
+
+            // rsaCheckV1证书模式验签
+            return AlipaySignature.rsaCheckV1(
                     params,
-                    aliPayProperties.getPublicKey(),
+                    alipayPublicKey,
                     aliPayProperties.getCharset(),
                     aliPayProperties.getSignType()
             );
