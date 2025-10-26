@@ -3,7 +3,7 @@ package org.dows.member.admin;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.dows.member.api.admin.AdminMemberInterestsApi;
-import org.dows.member.handler.admin.AdminMemberInterestsHandler;
+import org.dows.member.biz.admin.AdminMemberInterestsHandler;
 import org.dows.member.request.MemberInterestsListRequest;
 import org.dows.member.response.MemberInterestsGetResponse;
 import org.dows.member.request.admin.AdminMemberInterestsSaveRequest;

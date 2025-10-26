@@ -4,7 +4,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.dows.member.api.pay.WechatPayApi;
-import org.dows.member.handler.pay.PaymentBiz;
+import org.dows.member.biz.pay.PaymentBiz;
 //import org.dows.member.handler.pay.WechatPayBiz;
 import org.dows.member.request.pay.PayQrCodeRequest;
 import org.dows.member.response.pay.PayQrCodeResponse;

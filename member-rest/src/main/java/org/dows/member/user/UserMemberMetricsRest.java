@@ -4,7 +4,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.dows.member.api.user.UserMemberMetricsApi;
 import org.dows.member.exception.MemberException;
-import org.dows.member.handler.user.UserMemberMetricsHandler;
+import org.dows.member.biz.user.UserMemberMetricsHandler;
 import org.dows.member.response.MemberMetricsGetResponse;
 import org.dows.rade.aac.AacContext;
 import org.dows.rade.aac.AacUser;

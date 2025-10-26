@@ -2,7 +2,7 @@ package org.dows.member.user;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.dows.member.handler.user.UserMemberInterestsHandler;
+import org.dows.member.biz.user.UserMemberInterestsHandler;
 import org.dows.member.api.user.UserMemberInterestsApi;
 import org.dows.member.response.MemberInterestsGetResponse;
 import org.dows.member.request.MemberInterestsListRequest;

@@ -7,7 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.dows.member.api.pay.AliPayApi;
 import org.dows.member.enums.PayChannelEnum;
 import org.dows.member.exception.MemberException;
-import org.dows.member.handler.pay.PaymentBiz;
+import org.dows.member.biz.pay.PaymentBiz;
 import org.dows.member.request.pay.PayQrCodeRequest;
 import org.dows.member.response.pay.AliPayStatusResponse;
 import org.dows.member.response.pay.PayQrCodeResponse;
