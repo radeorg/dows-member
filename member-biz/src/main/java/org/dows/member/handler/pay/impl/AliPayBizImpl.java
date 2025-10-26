@@ -73,7 +73,7 @@ public class AliPayBizImpl implements AliPayBiz {
             String alipayPublicKey = aliPayConfig.getAlipayPublicKey();
 
             // rsaCheckV1证书模式验签
-            return AlipaySignature.rsaCheckV1(
+            return AlipaySignature.rsaCertCheckV1(
                     params,
                     alipayPublicKey,
                     aliPayProperties.getCharset(),
@@ -82,6 +82,9 @@ public class AliPayBizImpl implements AliPayBiz {
         } catch (AlipayApiException e) {
             log.error("验证回调签名失败", e);
             return false;
+        } catch (Exception e) {
+            log.error("验证回调签名失败", e);
+            throw new RuntimeException(e);
         }
     }
 

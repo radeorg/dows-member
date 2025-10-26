@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.util.StringUtils;
 
 import java.io.IOException;
@@ -13,12 +14,14 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class AliPayConfig {
 
+    private final static String FILE_PRE = "file:";
     private final static String HTTP_PRE = "http:";
     private final static String CLASSPATH_PRE = "classpath:";
     // 缓存公钥内容，避免重复读取证书文件
-    private String alipayPublicKeyCache;
+    private volatile String alipayPublicKeyCache;
 
     private final AliPayProperties aliPayProperties;
+    private final ResourceLoader resourceLoader;
 
     // 证书模式
     @Bean
@@ -50,7 +53,7 @@ public class AliPayConfig {
     /**
      * 获取支付宝公钥（从证书中提取）
      */
-    public String getAlipayPublicKey() {
+    public String getAlipayPublicKey() throws Exception {
         // 缓存公钥内容，避免重复读取证书文件
         if (alipayPublicKeyCache == null) {
             synchronized (this) {
@@ -67,7 +70,7 @@ public class AliPayConfig {
      * @param path 原始路径
      * @return 解析后的路径
      */
-    public String resolvePath(String path) {
+    private String resolvePath(String path) {
         if (!StringUtils.hasText(path)) {
             return path;
         }
