@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 @ConfigurationProperties(prefix = "wx.pay")
 public class WechatPayProperties {
 
+
     /** 应用ID */
 //    @Value("${wx.pay.app-id}")
     private String appId;
@@ -20,6 +21,14 @@ public class WechatPayProperties {
     /** 商户API私钥路径 */
 //    @Value("${wx.pay.private-key-path}")
     private String privateKeyPath;
+
+    /** 商户API公钥id */
+//    @Value("${wx.pay.private-key-path}")
+    private String publicKeyId;
+
+    /** 商户API公钥路径 */
+//    @Value("${wx.pay.private-key-path}")
+    private String pubKeyPath;
 
     /** 商户证书序列号 */
 //    @Value("${wx.pay.merchant-serial-number}")

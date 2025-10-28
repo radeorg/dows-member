@@ -11,8 +11,8 @@ public interface WechatPayBiz {
 
     PayQrCodeResponse wechatPayQrCode(WechatPayQrCodeRequest request);
 
-    Map<String, String> wechatPayNotify(HttpServletRequest request);
-
-    WechatPayStatusResponse wechatPayStatus(String outTradeNo);
+//    Map<String, String> wechatPayNotify(HttpServletRequest request);
+//
+//    WechatPayStatusResponse wechatPayStatus(String outTradeNo);
 
 }

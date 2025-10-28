@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Map;
 
 @Tag(name = "微信支付", description = "微信支付")
-@RequestMapping("/v1/wechat/pay")
+@RequestMapping("/v1/wx/pay")
 public interface WechatPayApi {
 
     @PostMapping("/qrcode")

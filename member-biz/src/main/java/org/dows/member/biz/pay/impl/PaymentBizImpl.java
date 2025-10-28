@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.mybatisflex.core.query.QueryWrapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.dows.member.biz.pay.WechatPayBiz;
 import org.dows.member.constant.MemberExceptionStatusCode;
 import org.dows.member.entity.MemberInstanceEntity;
 import org.dows.member.entity.MemberInterestsEntity;
@@ -47,7 +48,7 @@ public class PaymentBizImpl implements PaymentBiz {
     private final MemberInstanceService memberInstanceService;
     private final MemberInterestsService memberInterestsService;
     private final UserMemberChargeBiz userMemberChargeBiz;
-//    private final WechatPayBiz wechatPayBiz;
+    private final WechatPayBiz wechatPayBiz;
     private final AliPayBiz aliPayBiz;
     private final AliPayProperties aliPayProperties;
     private final SimpMessagingTemplate messagingTemplate;
@@ -98,7 +99,7 @@ public class PaymentBizImpl implements PaymentBiz {
             payQrCodeRequest.setTotalAmount(interests.getAmount());
             payQrCodeRequest.setDescription(chargeEntity.getNote());
 
-//            return wechatPayBiz.wechatPayQrCode(payQrCodeRequest);
+           return wechatPayBiz.wechatPayQrCode(payQrCodeRequest);
         } else if (request.getPayChannel().equals(PayChannelEnum.ALI.getCode())){
             AliPayQrCodeRequest payQrCodeRequest = new AliPayQrCodeRequest();
             payQrCodeRequest.setOutTradeNo(chargeEntity.getPayNo());
@@ -149,6 +150,7 @@ public class PaymentBizImpl implements PaymentBiz {
             log.error("取消支付宝支付失败：" + e.getMessage());
         }
     }
+
 
     @Override
     public AliPayStatusResponse aliPayStatus(String outTradeNo) {

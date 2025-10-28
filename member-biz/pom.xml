@@ -36,5 +36,9 @@
       <artifactId>alipay-sdk-java</artifactId>
       <version>4.35.79.ALL</version>
     </dependency>
+      <dependency>
+          <groupId>org.dows.cloud</groupId>
+          <artifactId>member-biz</artifactId>
+      </dependency>
   </dependencies>
 </project>
