@@ -1,5 +1,6 @@
 package org.dows.member.biz.pay.impl;
 
+import com.wechat.pay.java.core.notification.NotificationConfig;
 import com.wechat.pay.java.core.notification.NotificationParser;
 import com.wechat.pay.java.core.notification.RequestParam;
 import com.wechat.pay.java.service.payments.model.Transaction;
@@ -8,6 +9,7 @@ import com.wechat.pay.java.service.payments.nativepay.model.*;
 import jakarta.annotation.Resource;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import net.sf.jsqlparser.util.validation.ValidationException;
 import org.dows.member.biz.pay.WechatPayBiz;
 import org.dows.member.biz.utils.PaymentTimeConverter;
 import org.dows.member.config.WechatPayProperties;
@@ -15,7 +17,10 @@ import org.dows.member.exception.MemberException;
 import org.dows.member.request.pay.WxPayQrCodeRequest;
 import org.dows.member.response.pay.PayQrCodeResponse;
 import org.dows.member.response.pay.WxPayStatusResponse;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 import java.math.BigDecimal;
 
@@ -57,6 +62,7 @@ public class WechatPayBizImpl implements WechatPayBiz {
     @Override
     public WxPayStatusResponse wxPayNotify(String signature, String timestamp, String nonce, String serial, String body) {
         try {
+            // 构造 RequestParam
             RequestParam requestParam = new RequestParam.Builder()
                     .serialNumber(serial)
                     .nonce(nonce)
@@ -65,12 +71,16 @@ public class WechatPayBizImpl implements WechatPayBiz {
                     .body(body)
                     .build();
 
-            // 解析回调内容（自动验签和解密）
-            Transaction transaction = notificationParser.parse(requestParam, Transaction.class);
+            try {
+                // 以支付通知回调为例，验签、解密并转换成 Transaction
+                Transaction transaction = notificationParser.parse(requestParam, Transaction.class);
+                return transactionToRes(transaction);
+            } catch (ValidationException e) {
+                // 签名验证失败，返回 401 UNAUTHORIZED 状态码
+                log.error("sign verification failed", e);
 
-            log.info("微信支付成功: {}", transaction.getOutTradeNo());
-
-            return transactionToRes(transaction);
+            }
+            return transactionToRes(null);
         } catch (Exception e) {
             log.error("微信验证回调签名失败", e);
             throw new RuntimeException(e);
@@ -119,7 +129,9 @@ public class WechatPayBizImpl implements WechatPayBiz {
         // 交易状态说明：WAIT_BUYER_PAY(待付款)、TRADE_SUCCESS(支付成功)、TRADE_CLOSED(交易关闭)等FAIL
         response.setTradeState(transaction.getTradeState().name());
         response.setTradeStateDesc(transaction.getTradeStateDesc());
-        response.setTotalAmount(amountToStr(transaction.getAmount().getTotal()));
+        if (!StringUtils.isEmpty(transaction.getAmount())){
+            response.setTotalAmount(amountToStr(transaction.getAmount().getTotal()));
+        }
         response.setPayAmount(response.getTotalAmount());
         response.setSuccessTime(PaymentTimeConverter.format(transaction.getSuccessTime()));
         response.setSuccess(true);

@@ -1,15 +1,15 @@
-package org.dows.member.biz.pay;
+package org.dows.member.config;
 
 import com.wechat.pay.java.core.Config;
+import com.wechat.pay.java.core.RSAAutoCertificateConfig;
 import com.wechat.pay.java.core.RSAPublicKeyConfig;
 import com.wechat.pay.java.core.cipher.Verifier;
 import com.wechat.pay.java.core.notification.NotificationConfig;
 import com.wechat.pay.java.core.notification.NotificationParser;
 import com.wechat.pay.java.core.notification.RSACombinedNotificationConfig;
+import com.wechat.pay.java.core.notification.RSAPublicKeyNotificationConfig;
 import com.wechat.pay.java.service.payments.nativepay.NativePayService;
-import jakarta.annotation.Resource;
 import lombok.RequiredArgsConstructor;
-import org.dows.member.config.WechatPayProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.util.StringUtils;
@@ -19,15 +19,9 @@ import java.io.IOException;
 @Configuration
 @RequiredArgsConstructor
 public class WechatPayV3Config {
-
-    private WechatPayProperties wechatPayProperties;
-    private Verifier verifier;
-
-    private final static String FILE_PRE = "file:";
+    private final WechatPayProperties wechatPayProperties;
     private final static String HTTP_PRE = "http:";
     private final static String CLASSPATH_PRE = "classpath:";
-    // 缓存公钥内容，避免重复读取证书文件
-    private volatile String alipayPublicKeyCache;
 
 
     /**
@@ -36,12 +30,12 @@ public class WechatPayV3Config {
     @Bean
     public Config wechatPayConfig() {
         String privateKeyPath = resolvePath(wechatPayProperties.getPrivateKeyPath());
-//        String pubKeyPath = resolvePath(wechatPayProperties.getPubKeyPath());
+        String pubKeyPath = resolvePath(wechatPayProperties.getPubKeyPath());
         return new RSAPublicKeyConfig.Builder()
                 .merchantId(wechatPayProperties.getMerchantId())
                 .privateKeyFromPath(privateKeyPath)
-//                .publicKeyFromPath(pubKeyPath)
-//                .publicKeyId(wechatPayProperties.getPublicKeyId())
+                .publicKeyFromPath(pubKeyPath)
+                .publicKeyId(wechatPayProperties.getPublicKeyId())
                 .merchantSerialNumber(wechatPayProperties.getMerchantSerialNumber())
                 .apiV3Key(wechatPayProperties.getApiV3Key())
                 .build();
@@ -57,37 +51,20 @@ public class WechatPayV3Config {
                 .build();
     }
 
-//    @Bean
-//    public NotificationConfig wechatValidateSignConfig() {
-//        String privateKeyPath = resolvePath(wechatPayProperties.getPrivateKeyPath());
-//        return new RSAPublicKeyConfig.Builder()
-//                .merchantId(wechatPayProperties.getMerchantId())
-//                .privateKeyFromPath(privateKeyPath)
-//                .merchantSerialNumber(wechatPayProperties.getMerchantSerialNumber())
-//                .apiV3Key(wechatPayProperties.getApiV3Key())
-//                .build();
-//    }
-
-    /**
-     * 创建通知解析器（SDK 0.2.15版本最新方式）
-     */
     @Bean
     public NotificationParser notificationParser() {
-        String privateKeyPath = resolvePath(wechatPayProperties.getPrivateKeyPath());
-        // 创建配置对象
-        NotificationConfig config = new RSACombinedNotificationConfig.Builder()
-//                .merchantId(wechatPayProperties.getMerchantId())
-//                .privateKeyFromPath(privateKeyPath)
+        String pubKeyPath = resolvePath(wechatPayProperties.getPubKeyPath());
+        NotificationConfig config = new RSAPublicKeyNotificationConfig.Builder()
+                .publicKeyFromPath(pubKeyPath)
+                .publicKeyId(wechatPayProperties.getPublicKeyId())
                 .apiV3Key(wechatPayProperties.getApiV3Key())
-                .merchantSerialNumber(wechatPayProperties.getMerchantSerialNumber())
-
                 .build();
-
         return new NotificationParser(config);
     }
 
     /**
      * 解析路径
+     *
      * @param path 原始路径
      * @return 解析后的路径
      */
@@ -107,6 +84,7 @@ public class WechatPayV3Config {
 
     /**
      * 解析classpath路径
+     *
      * @param path 包含classpath前缀的路径
      * @return 解析后的文件系统路径
      */
@@ -126,6 +104,7 @@ public class WechatPayV3Config {
 
     /**
      * 解析HTTP路径（待实现）
+     *
      * @param path HTTP路径
      * @return 解析后的路径
      */
@@ -137,6 +116,7 @@ public class WechatPayV3Config {
 
     /**
      * 移除classpath前缀
+     *
      * @param path 原始路径
      * @return 处理后的路径
      */

@@ -23,7 +23,7 @@ public interface WechatPayApi {
     @Operation(summary = "支付结果回调处理")
     Map<String, String> wechatPayNotify(HttpServletRequest request) throws IOException;
 
-    @PostMapping("/queryStatus")
+    @GetMapping("/queryStatus")
     @Operation(summary = "查询订单状态接口")
     WxPayStatusResponse wechatPayStatus(@RequestParam("outTradeNo") String outTradeNo);
 }
