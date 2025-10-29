@@ -13,10 +13,10 @@ import org.dows.member.response.pay.WxPayStatusResponse;
 import org.dows.rade.aac.AacContext;
 import org.dows.rade.aac.AacUser;
 import org.dows.rade.context.AppContext;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
-import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -38,14 +38,16 @@ public class WechatPayRest implements WechatPayApi {
     }
 
     @Override
-    public Map<String, String> wechatPayNotify(HttpServletRequest request) throws IOException {
+    public ResponseEntity<String> wechatPayNotify(HttpServletRequest request) throws IOException {
         String signature = request.getHeader("Wechatpay-Signature");
         String timestamp = request.getHeader("Wechatpay-Timestamp");
         String nonce = request.getHeader("Wechatpay-Nonce");
         String serial = request.getHeader("Wechatpay-Serial");
         String body = request.getReader().lines().collect(Collectors.joining()); // 原始请求体
 
-        return paymentBiz.wxPayNotify(signature, timestamp, nonce, serial, body);
+        paymentBiz.wxPayNotify(signature, timestamp, nonce, serial, body);
+
+        return ResponseEntity.ok("200");
     }
 
     @Override

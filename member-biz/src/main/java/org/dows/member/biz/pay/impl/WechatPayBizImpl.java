@@ -1,6 +1,5 @@
 package org.dows.member.biz.pay.impl;
 
-import com.wechat.pay.java.core.notification.NotificationConfig;
 import com.wechat.pay.java.core.notification.NotificationParser;
 import com.wechat.pay.java.core.notification.RequestParam;
 import com.wechat.pay.java.service.payments.model.Transaction;
@@ -17,7 +16,6 @@ import org.dows.member.request.pay.WxPayQrCodeRequest;
 import org.dows.member.response.pay.PayQrCodeResponse;
 import org.dows.member.response.pay.WxPayStatusResponse;
 import org.springframework.stereotype.Component;
-import org.springframework.util.StringUtils;
 
 import java.math.BigDecimal;
 
@@ -75,9 +73,8 @@ public class WechatPayBizImpl implements WechatPayBiz {
             } catch (Exception e) {
                 // 签名验证失败，返回 401 UNAUTHORIZED 状态码
                 log.error("sign verification failed", e);
-
+                throw new RuntimeException(e);
             }
-            return transactionToRes(null);
         } catch (Exception e) {
             log.error("微信验证回调签名失败", e);
             throw new RuntimeException(e);
@@ -126,7 +123,7 @@ public class WechatPayBizImpl implements WechatPayBiz {
         // 交易状态说明：WAIT_BUYER_PAY(待付款)、TRADE_SUCCESS(支付成功)、TRADE_CLOSED(交易关闭)等FAIL
         response.setTradeState(transaction.getTradeState().name());
         response.setTradeStateDesc(transaction.getTradeStateDesc());
-        if (!StringUtils.isEmpty(transaction.getAmount())){
+        if (transaction.getAmount() != null){
             response.setTotalAmount(amountToStr(transaction.getAmount().getTotal()));
         }
         response.setPayAmount(response.getTotalAmount());

@@ -42,7 +42,7 @@ public interface PaymentBiz {
      * @param serial 验签的微信支付平台证书序列号/微信支付公钥ID
      * @param body 回调内容
      */
-    Map<String, String> wxPayNotify(String signature, String timestamp, String nonce, String serial, String body);
+    void wxPayNotify(String signature, String timestamp, String nonce, String serial, String body);
 
     /**
      * 查询微信支付状态

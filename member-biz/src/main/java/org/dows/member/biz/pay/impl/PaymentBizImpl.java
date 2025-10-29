@@ -29,6 +29,8 @@ import org.dows.member.response.pay.PayQrCodeResponse;
 import org.dows.member.response.pay.WxPayStatusResponse;
 import org.dows.member.service.MemberInstanceService;
 import org.dows.member.service.MemberInterestsService;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Component;
@@ -77,7 +79,6 @@ public class PaymentBizImpl implements PaymentBiz {
         MemberChargeGetResponse chargeGetResponse = userMemberChargeBiz.getWaitPayByAccountInstanceId(request.getAccountInstanceId());
         if (chargeGetResponse != null) {
             if (chargeGetResponse.getChannel().equals(PayChannelEnum.WECHAT.getCode())) {
-                // TODO
                 closeWxPay(chargeGetResponse.getPayNo());
             } else if (chargeGetResponse.getChannel().equals(PayChannelEnum.ALI.getCode())){
                 cancelAliPay(chargeGetResponse.getPayNo());
@@ -173,25 +174,15 @@ public class PaymentBizImpl implements PaymentBiz {
     }
 
     @Override
-    public Map<String, String> wxPayNotify(String signature, String timestamp, String nonce, String serial, String body) {
+    public void wxPayNotify(String signature, String timestamp, String nonce, String serial, String body) {
         try {
             WxPayStatusResponse payStatusResponse = wechatPayBiz.wxPayNotify(signature, timestamp, nonce, serial, body);
 
             wxPayStatus(payStatusResponse.getOutTradeNo());
-
-            Map<String, String> response = new HashMap<>();
-            response.put("code", "SUCCESS");
-            response.put("message", "成功");
-
-            return response;
         } catch (Exception e) {
             log.error("微信验证回调签名失败", e);
 
-            Map<String, String> response = new HashMap<>();
-            response.put("code", "FAIL");
-            response.put("message", e.getMessage());
-
-            return response;
+            throw new PayException(e.getMessage());
         }
     }
 

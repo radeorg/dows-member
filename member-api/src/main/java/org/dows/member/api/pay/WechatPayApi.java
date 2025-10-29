@@ -6,10 +6,10 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.dows.member.request.pay.PayQrCodeRequest;
 import org.dows.member.response.pay.PayQrCodeResponse;
 import org.dows.member.response.pay.WxPayStatusResponse;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
-import java.util.Map;
 
 @Tag(name = "微信支付", description = "微信支付")
 @RequestMapping("/v1/wx/pay")
@@ -21,7 +21,7 @@ public interface WechatPayApi {
 
     @PostMapping("/notify")
     @Operation(summary = "支付结果回调处理")
-    Map<String, String> wechatPayNotify(HttpServletRequest request) throws IOException;
+    ResponseEntity<String> wechatPayNotify(HttpServletRequest request) throws IOException;
 
     @GetMapping("/queryStatus")
     @Operation(summary = "查询订单状态接口")
