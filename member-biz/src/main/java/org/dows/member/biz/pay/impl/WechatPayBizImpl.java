@@ -9,7 +9,6 @@ import com.wechat.pay.java.service.payments.nativepay.model.*;
 import jakarta.annotation.Resource;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import net.sf.jsqlparser.util.validation.ValidationException;
 import org.dows.member.biz.pay.WechatPayBiz;
 import org.dows.member.biz.utils.PaymentTimeConverter;
 import org.dows.member.config.WechatPayProperties;
@@ -17,8 +16,6 @@ import org.dows.member.exception.MemberException;
 import org.dows.member.request.pay.WxPayQrCodeRequest;
 import org.dows.member.response.pay.PayQrCodeResponse;
 import org.dows.member.response.pay.WxPayStatusResponse;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
@@ -75,7 +72,7 @@ public class WechatPayBizImpl implements WechatPayBiz {
                 // 以支付通知回调为例，验签、解密并转换成 Transaction
                 Transaction transaction = notificationParser.parse(requestParam, Transaction.class);
                 return transactionToRes(transaction);
-            } catch (ValidationException e) {
+            } catch (Exception e) {
                 // 签名验证失败，返回 401 UNAUTHORIZED 状态码
                 log.error("sign verification failed", e);
 
