@@ -18,6 +18,9 @@ import org.dows.member.response.pay.WxPayStatusResponse;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 
 @Slf4j
 @Component
@@ -127,7 +130,8 @@ public class WechatPayBizImpl implements WechatPayBiz {
             response.setTotalAmount(amountToStr(transaction.getAmount().getTotal()));
         }
         response.setPayAmount(response.getTotalAmount());
-        response.setSuccessTime(PaymentTimeConverter.format(transaction.getSuccessTime()));
+        response.setSuccessTime(paymentTimeConverter(transaction.getSuccessTime()));
+     //   response.setSuccessTime(PaymentTimeConverter.format(transaction.getSuccessTime()));
         response.setSuccess(true);
 
         return response;
@@ -136,5 +140,12 @@ public class WechatPayBizImpl implements WechatPayBiz {
     private String amountToStr(Integer amount){
         double tempResult = (double) amount / 100;
         return String.format("%.2f", tempResult);
+    }
+    private LocalDateTime paymentTimeConverter(String successTime){
+        if (successTime != null){
+            LocalDateTime localDateTime2 = LocalDateTime.ofInstant(Instant.parse(successTime), ZoneId.systemDefault());
+            return localDateTime2;
+        }
+      return null;
     }
 }
