@@ -1,6 +1,5 @@
 package org.dows.member.biz.pay;
 
-import com.alipay.api.AlipayApiException;
 import org.dows.member.request.pay.AliPayQrCodeRequest;
 import org.dows.member.response.pay.AliPayStatusResponse;
 import org.dows.member.response.pay.PayQrCodeResponse;
@@ -31,5 +30,5 @@ public interface AliPayBiz {
     /**
      * 取消支付
      */
-    void cancelPay(String outTradeNo) throws AlipayApiException;
+    void cancelPay(String outTradeNo) throws Exception;
 }

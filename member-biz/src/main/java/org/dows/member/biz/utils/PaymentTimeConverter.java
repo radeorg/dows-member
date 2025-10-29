@@ -1,5 +1,7 @@
 package org.dows.member.biz.utils;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -66,6 +68,15 @@ public class PaymentTimeConverter {
             return null;
         }
         return localDateTime.format(formatter);
+    }
+
+    public static LocalDateTime format(String successTime) {
+        if (StringUtils.isEmpty(successTime)) {
+            return null;
+        }
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssXXX");
+        ZonedDateTime zonedDateTime = ZonedDateTime.parse(successTime, formatter);
+        return LocalDateTime.from(zonedDateTime.toInstant());
     }
 
     /**

@@ -1,25 +1,27 @@
-package org.dows.member.config;
+package org.dows.member.biz.pay;
 
-import cn.hutool.core.io.resource.ClassPathResource;
 import com.wechat.pay.java.core.Config;
 import com.wechat.pay.java.core.RSAPublicKeyConfig;
+import com.wechat.pay.java.core.cipher.Verifier;
 import com.wechat.pay.java.core.notification.NotificationConfig;
 import com.wechat.pay.java.core.notification.NotificationParser;
 import com.wechat.pay.java.core.notification.RSACombinedNotificationConfig;
 import com.wechat.pay.java.service.payments.nativepay.NativePayService;
 import jakarta.annotation.Resource;
+import lombok.RequiredArgsConstructor;
+import org.dows.member.config.WechatPayProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.io.ResourceLoader;
 import org.springframework.util.StringUtils;
 
 import java.io.IOException;
 
 @Configuration
+@RequiredArgsConstructor
 public class WechatPayV3Config {
 
-    @Resource
     private WechatPayProperties wechatPayProperties;
+    private Verifier verifier;
 
     private final static String FILE_PRE = "file:";
     private final static String HTTP_PRE = "http:";
@@ -34,16 +36,15 @@ public class WechatPayV3Config {
     @Bean
     public Config wechatPayConfig() {
         String privateKeyPath = resolvePath(wechatPayProperties.getPrivateKeyPath());
-        String pubKeyPath = resolvePath(wechatPayProperties.getPubKeyPath());
-        Config config = new RSAPublicKeyConfig.Builder()
+//        String pubKeyPath = resolvePath(wechatPayProperties.getPubKeyPath());
+        return new RSAPublicKeyConfig.Builder()
                 .merchantId(wechatPayProperties.getMerchantId())
                 .privateKeyFromPath(privateKeyPath)
-                .publicKeyFromPath(pubKeyPath)
-                .publicKeyId(wechatPayProperties.getPublicKeyId())
+//                .publicKeyFromPath(pubKeyPath)
+//                .publicKeyId(wechatPayProperties.getPublicKeyId())
                 .merchantSerialNumber(wechatPayProperties.getMerchantSerialNumber())
                 .apiV3Key(wechatPayProperties.getApiV3Key())
                 .build();
-        return config;
     }
 
     /**
@@ -55,32 +56,35 @@ public class WechatPayV3Config {
                 .config(config)
                 .build();
     }
-//
+
 //    @Bean
 //    public NotificationConfig wechatValidateSignConfig() {
+//        String privateKeyPath = resolvePath(wechatPayProperties.getPrivateKeyPath());
 //        return new RSAPublicKeyConfig.Builder()
 //                .merchantId(wechatPayProperties.getMerchantId())
-//                .privateKeyFromPath(wechatPayProperties.getPrivateKeyPath())
+//                .privateKeyFromPath(privateKeyPath)
 //                .merchantSerialNumber(wechatPayProperties.getMerchantSerialNumber())
 //                .apiV3Key(wechatPayProperties.getApiV3Key())
 //                .build();
 //    }
-//
-//    /**
-//     * 创建通知解析器（SDK 0.2.15版本最新方式）
-//     */
-//    @Bean
-//    public NotificationParser notificationParser() {
-//        // 创建配置对象
-//        NotificationConfig config = new RSACombinedNotificationConfig.Builder()
+
+    /**
+     * 创建通知解析器（SDK 0.2.15版本最新方式）
+     */
+    @Bean
+    public NotificationParser notificationParser() {
+        String privateKeyPath = resolvePath(wechatPayProperties.getPrivateKeyPath());
+        // 创建配置对象
+        NotificationConfig config = new RSACombinedNotificationConfig.Builder()
 //                .merchantId(wechatPayProperties.getMerchantId())
-//                .privateKeyFromPath(wechatPayProperties.getPrivateKeyPath())
-//                .merchantSerialNumber(wechatPayProperties.getMerchantSerialNumber())
-//                .apiV3Key(wechatPayProperties.getApiV3Key())
-//                .build();
-//
-//        return new NotificationParser(config);
-//    }
+//                .privateKeyFromPath(privateKeyPath)
+                .apiV3Key(wechatPayProperties.getApiV3Key())
+                .merchantSerialNumber(wechatPayProperties.getMerchantSerialNumber())
+
+                .build();
+
+        return new NotificationParser(config);
+    }
 
     /**
      * 解析路径

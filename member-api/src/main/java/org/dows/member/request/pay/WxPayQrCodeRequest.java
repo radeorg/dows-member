@@ -7,7 +7,7 @@ import java.math.BigDecimal;
 
 @Data
 @Schema(description = "微信支付统一下单请求")
-public class WechatPayQrCodeRequest {
+public class WxPayQrCodeRequest {
 
     @Schema(description = "订单号")
     private String outTradeNo;

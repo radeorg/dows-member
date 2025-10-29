@@ -14,7 +14,6 @@ import com.alipay.api.response.AlipayTradePrecreateResponse;
 import com.alipay.api.response.AlipayTradeQueryResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.dows.member.enums.MemberChargeStateEnum;
 import org.dows.member.exception.MemberException;
 import org.dows.member.config.AliPayConfig;
 import org.dows.member.config.AliPayProperties;
@@ -58,11 +57,11 @@ public class AliPayBizImpl implements AliPayBiz {
 
                 return payResponse;
             } else {
-                throw new MemberException("创建支付订单失败: " + response.getSubMsg());
+                throw new MemberException("创建支付宝支付订单失败: " + response.getSubMsg());
             }
         } catch (AlipayApiException e) {
-            log.error("创建支付宝订单失败", e);
-            throw new MemberException("创建支付订单失败: " + e.getMessage());
+            log.error("创建支付宝支付订单失败", e);
+            throw new MemberException("创建支付宝支付订单失败: " + e.getMessage());
         }
     }
 
@@ -80,10 +79,10 @@ public class AliPayBizImpl implements AliPayBiz {
                     aliPayProperties.getSignType()
             );
         } catch (AlipayApiException e) {
-            log.error("验证回调签名失败", e);
+            log.error("支付宝验证回调签名失败", e);
             return false;
         } catch (Exception e) {
-            log.error("验证回调签名失败", e);
+            log.error("支付宝验证回调签名失败", e);
             throw new RuntimeException(e);
         }
     }
@@ -104,26 +103,26 @@ public class AliPayBizImpl implements AliPayBiz {
             if (response.isSuccess()) {
                 queryResponse.setOutTradeNo(outTradeNo);
                 queryResponse.setTradeNo(response.getTradeNo());
-                // 交易状态说明：WAIT_BUYER_PAY(待付款)、TRADE_SUCCESS(支付成功)、TRADE_CLOSED(交易关闭)等FAIL
+                // 交易状态：WAIT_BUYER_PAY（交易创建，等待买家付款）、TRADE_CLOSED（未付款交易超时关闭，或支付完成后全额退款）、TRADE_SUCCESS（交易支付成功）、TRADE_FINISHED（交易结束，不可退款）
                 queryResponse.setTradeState(response.getTradeStatus());
                 queryResponse.setTotalAmount(response.getTotalAmount());
+                queryResponse.setPayAmount(response.getBuyerPayAmount());
                 queryResponse.setSendPayDate(PaymentTimeConverter.toLocalDateTime(response.getSendPayDate()));
                 queryResponse.setSuccess(true);
             } else {
-                queryResponse.setTradeState(MemberChargeStateEnum.FAILED.getCode());
-                queryResponse.setSuccess(false);
-                queryResponse.setMessage(response.getMsg());
+                log.error("支付宝订单查询失败: {}，错误信息: {}", outTradeNo, response.getMsg());
+                throw new AlipayApiException("支付宝订单查询失败: " + response.getMsg());
             }
         } catch (AlipayApiException e) {
             log.error("查询支付宝订单失败", e);
             queryResponse.setSuccess(false);
-            queryResponse.setMessage("系统错误: " + e.getMessage());
+            queryResponse.setMessage("查询支付宝订单失败: " + e.getMessage());
         }
         return queryResponse;
     }
 
     @Override
-    public void cancelPay(String outTradeNo) throws AlipayApiException {
+    public void cancelPay(String outTradeNo) throws Exception {
         // 构造请求参数以调用接口
         AlipayTradeCancelModel model = new AlipayTradeCancelModel();
         model.setOutTradeNo(outTradeNo);
@@ -133,12 +132,12 @@ public class AliPayBizImpl implements AliPayBiz {
 
         AlipayTradeCancelResponse response = alipayClient.certificateExecute(request);
         if (response.isSuccess()) {
-            log.info("订单撤销成功: {}", outTradeNo);
+            log.info("支付宝订单撤销成功: {}", outTradeNo);
         } else {
-            log.error("订单撤销失败: {}，错误信息: {}", outTradeNo, response.getMsg());
+            log.error("支付宝订单撤销失败: {}，错误信息: {}", outTradeNo, response.getMsg());
 
             if (!"40004".equals(response.getCode()) && !"ACQ.TRADE_NOT_EXIST".equals(response.getSubCode())) {
-                throw new AlipayApiException("订单撤销失败: " + response.getMsg());
+                throw new AlipayApiException("支付宝订单撤销失败: " + response.getMsg());
             }
         }
     }

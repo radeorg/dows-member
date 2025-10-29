@@ -17,14 +17,16 @@ import org.dows.member.config.AliPayProperties;
 import org.dows.member.biz.pay.AliPayBiz;
 import org.dows.member.biz.pay.PaymentBiz;
 import org.dows.member.biz.user.UserMemberChargeBiz;
+import org.dows.member.exception.PayException;
 import org.dows.member.request.pay.AliPayQrCodeRequest;
 import org.dows.member.request.pay.PayQrCodeRequest;
-import org.dows.member.request.pay.WechatPayQrCodeRequest;
+import org.dows.member.request.pay.WxPayQrCodeRequest;
 import org.dows.member.request.user.UserMemberChargeSaveRequest;
 import org.dows.member.request.user.UserMemberChargeUpdateRequest;
 import org.dows.member.response.MemberChargeGetResponse;
 import org.dows.member.response.pay.AliPayStatusResponse;
 import org.dows.member.response.pay.PayQrCodeResponse;
+import org.dows.member.response.pay.WxPayStatusResponse;
 import org.dows.member.service.MemberInstanceService;
 import org.dows.member.service.MemberInterestsService;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -32,6 +34,9 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -73,6 +78,7 @@ public class PaymentBizImpl implements PaymentBiz {
         if (chargeGetResponse != null) {
             if (chargeGetResponse.getChannel().equals(PayChannelEnum.WECHAT.getCode())) {
                 // TODO
+                closeWxPay(chargeGetResponse.getPayNo());
             } else if (chargeGetResponse.getChannel().equals(PayChannelEnum.ALI.getCode())){
                 cancelAliPay(chargeGetResponse.getPayNo());
             }
@@ -94,12 +100,12 @@ public class PaymentBizImpl implements PaymentBiz {
 
         // 调用第三方支付
         if (request.getPayChannel().equals(PayChannelEnum.WECHAT.getCode())) {
-            WechatPayQrCodeRequest payQrCodeRequest = new WechatPayQrCodeRequest();
+            WxPayQrCodeRequest payQrCodeRequest = new WxPayQrCodeRequest();
             payQrCodeRequest.setOutTradeNo(chargeEntity.getPayNo());
             payQrCodeRequest.setTotalAmount(interests.getAmount());
             payQrCodeRequest.setDescription(chargeEntity.getNote());
 
-           return wechatPayBiz.wechatPayQrCode(payQrCodeRequest);
+           return wechatPayBiz.wxPayQrCode(payQrCodeRequest);
         } else if (request.getPayChannel().equals(PayChannelEnum.ALI.getCode())){
             AliPayQrCodeRequest payQrCodeRequest = new AliPayQrCodeRequest();
             payQrCodeRequest.setOutTradeNo(chargeEntity.getPayNo());
@@ -122,7 +128,7 @@ public class PaymentBizImpl implements PaymentBiz {
 
         // 验证回调签名
         if (!aliPayBiz.verifyNotify(params)) {
-            log.warn("回调签名验证失败");
+            log.warn("支付宝回调签名验证失败");
             return "fail";
         }
 
@@ -131,7 +137,7 @@ public class PaymentBizImpl implements PaymentBiz {
         String tradeStatus = params.get("trade_status");
 
         if (AliPayStateEnum.TRADE_SUCCESS.getCode().equals(tradeStatus)) {
-            log.info("订单支付成功，商户订单号: {}", outTradeNo);
+            log.info("支付宝订单支付成功，商户订单号: {}", outTradeNo);
 
             AliPayStatusResponse orderStatus = aliPayStatus(outTradeNo);
 
@@ -148,9 +154,9 @@ public class PaymentBizImpl implements PaymentBiz {
             userMemberChargeBiz.close(outTradeNo);
         } catch (Exception e) {
             log.error("取消支付宝支付失败：" + e.getMessage());
+            throw new PayException(e.getMessage());
         }
     }
-
 
     @Override
     public AliPayStatusResponse aliPayStatus(String outTradeNo) {
@@ -164,6 +170,54 @@ public class PaymentBizImpl implements PaymentBiz {
         userMemberChargeBiz.update(chargeUpdateRequest);
 
         return orderStatus;
+    }
+
+    @Override
+    public Map<String, String> wxPayNotify(String signature, String timestamp, String nonce, String serial, String body) {
+        try {
+            WxPayStatusResponse payStatusResponse = wechatPayBiz.wxPayNotify(signature, timestamp, nonce, serial, body);
+
+            wxPayStatus(payStatusResponse.getOutTradeNo());
+
+            Map<String, String> response = new HashMap<>();
+            response.put("code", "SUCCESS");
+            response.put("message", "成功");
+
+            return response;
+        } catch (Exception e) {
+            log.error("微信验证回调签名失败", e);
+
+            Map<String, String> response = new HashMap<>();
+            response.put("code", "FAIL");
+            response.put("message", e.getMessage());
+
+            return response;
+        }
+    }
+
+    @Override
+    public WxPayStatusResponse wxPayStatus(String outTradeNo) {
+        WxPayStatusResponse orderStatus = wechatPayBiz.wxPayStatus(outTradeNo);
+
+        UserMemberChargeUpdateRequest chargeUpdateRequest = new UserMemberChargeUpdateRequest();
+        chargeUpdateRequest.setPayNo(orderStatus.getOutTradeNo());
+        chargeUpdateRequest.setState(orderStatus.getTradeState());
+        chargeUpdateRequest.setTransactionId(orderStatus.getTradeNo());
+        chargeUpdateRequest.setPayTime(orderStatus.getSuccessTime());
+        userMemberChargeBiz.update(chargeUpdateRequest);
+
+        return orderStatus;
+    }
+
+    @Override
+    public void closeWxPay(String outTradeNo) throws PayException {
+        try {
+            wechatPayBiz.closePay(outTradeNo);
+            userMemberChargeBiz.close(outTradeNo);
+        } catch (Exception e) {
+            log.error("取消微信支付失败：" + e.getMessage());
+            throw new PayException(e.getMessage());
+        }
     }
 
     private MemberChargeGetResponse saveMemberCharge(MemberInstanceEntity instance,
