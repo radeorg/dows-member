@@ -7,11 +7,11 @@ import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
 
 /**
- * 支付宝支付socket通知前端
+ * 支付宝、微信支付socket通知前端
  */
 @Configuration
 @EnableWebSocketMessageBroker
-public class AliPayWebSocketConfig implements WebSocketMessageBrokerConfigurer {
+public class PayWebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void configureMessageBroker(MessageBrokerRegistry config) {
@@ -21,7 +21,7 @@ public class AliPayWebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-        registry.addEndpoint("/ws/ali/pay")
+        registry.addEndpoint("/ws/pay")
                 .setAllowedOriginPatterns("*")
                 .withSockJS();
     }

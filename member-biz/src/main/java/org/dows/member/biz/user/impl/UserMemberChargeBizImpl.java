@@ -25,6 +25,12 @@ public class UserMemberChargeBizImpl implements UserMemberChargeBiz {
     private final UserMemberChargeHandler userMemberChargeHandler;
 
     @Override
+    public MemberChargeGetResponse getByPaNo(String payNo) {
+        MemberChargeEntity entity = getMemberChargeByPayNo(payNo);
+        return BeanUtil.copyProperties(entity, MemberChargeGetResponse.class);
+    }
+
+    @Override
     public MemberChargeGetResponse save(UserMemberChargeSaveRequest request) {
         return userMemberChargeHandler.save(request);
     }

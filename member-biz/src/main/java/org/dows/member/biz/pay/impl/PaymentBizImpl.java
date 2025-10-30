@@ -4,6 +4,8 @@ import com.alibaba.fastjson.JSON;
 import com.mybatisflex.core.query.QueryWrapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+import org.dows.member.biz.pay.AliPayPollingTask;
 import org.dows.member.biz.pay.WechatPayBiz;
 import org.dows.member.constant.MemberExceptionStatusCode;
 import org.dows.member.entity.MemberInstanceEntity;
@@ -54,6 +56,7 @@ public class PaymentBizImpl implements PaymentBiz {
     // 轮询线程池
     private final ScheduledExecutorService pollingExecutor = Executors.newScheduledThreadPool(5);
     private final ThreadPoolTaskExecutor aliPayPollingTask;
+//    private final ThreadPoolTaskExecutor wxPayPollingTask;
 
     @Transactional
     @Override
@@ -134,7 +137,12 @@ public class PaymentBizImpl implements PaymentBiz {
 
             AliPayStatusResponse orderStatus = aliPayStatus(outTradeNo);
 
-            sendPaymentSuccessNotification(outTradeNo, orderStatus);
+            String state = getChargeState(PayChannelEnum.ALI.getCode(), orderStatus.getTradeState());
+            sendPaymentSuccessNotification(
+                    outTradeNo,
+                    state,
+                    orderStatus.getTotalAmount(),
+                    orderStatus.getPayAmount());
         }
 
         return "success";
@@ -166,7 +174,7 @@ public class PaymentBizImpl implements PaymentBiz {
 
         // 统一转成本系统的支付状态
         orderStatus.setTradeState(state);
-        orderStatus.setTradeStateDesc(MemberChargeStateEnum.getDescByCode(state));
+        orderStatus.setTradeStateDesc(state.isEmpty() ? "查询失败" : MemberChargeStateEnum.getDescByCode(state));
 
         return orderStatus;
     }
@@ -176,7 +184,13 @@ public class PaymentBizImpl implements PaymentBiz {
         try {
             WxPayStatusResponse payStatusResponse = wechatPayBiz.wxPayNotify(signature, timestamp, nonce, serial, body);
 
-            wxPayStatus(payStatusResponse.getOutTradeNo());
+            WxPayStatusResponse orderStatus = wxPayStatus(payStatusResponse.getOutTradeNo());
+
+            String state = getChargeState(PayChannelEnum.WX.getCode(), orderStatus.getTradeState());
+            sendPaymentSuccessNotification(payStatusResponse.getOutTradeNo(),
+                    state,
+                    orderStatus.getTotalAmount(),
+                    orderStatus.getPayAmount());
         } catch (Exception e) {
             log.error("微信验证回调签名失败", e);
 
@@ -199,7 +213,7 @@ public class PaymentBizImpl implements PaymentBiz {
 
         // 统一转成本系统的支付状态
         orderStatus.setTradeState(state);
-        orderStatus.setTradeStateDesc(MemberChargeStateEnum.getDescByCode(state));
+        orderStatus.setTradeStateDesc(state.isEmpty() ? "查询失败" : MemberChargeStateEnum.getDescByCode(state));
 
         return orderStatus;
     }
@@ -301,26 +315,10 @@ public class PaymentBizImpl implements PaymentBiz {
             } else {
                 log.info("支付轮询完成，订单号: {}，状态: {}", outTradeNo, orderStatus.getTradeState());
                 // 推送结果给前端
-                sendPaymentSuccessNotification(outTradeNo, orderStatus);
+                String state = getChargeState(PayChannelEnum.ALI.getCode(), orderStatus.getTradeState());
+                sendPaymentSuccessNotification(outTradeNo, state, orderStatus.getTotalAmount(), orderStatus.getPayAmount());
             }
         });
-    }
-
-    /**
-     * 发送支付成功通知给前端
-     */
-    private void sendPaymentSuccessNotification(String outTradeNo, AliPayStatusResponse orderStatus) {
-        try {
-            Map<String, Object> message = new HashMap<>();
-            message.put("outTradeNo", outTradeNo);
-            message.put("tradeStatus", orderStatus.getTradeState());
-            message.put("totalAmount", orderStatus.getTotalAmount());
-
-            messagingTemplate.convertAndSend("/topic/ws/ali/pay/" + outTradeNo, message);
-            log.info("已发送支付结果通知，订单号: {}", outTradeNo);
-        } catch (Exception e) {
-            log.error("发送支付通知失败", e);
-        }
     }
 
     /**
@@ -335,7 +333,13 @@ public class PaymentBizImpl implements PaymentBiz {
         // 沙箱环境使用默认初始延迟，否则使用传入的初始延迟
         int actualInitialDelay = aliPayProperties.isSandBoxEnabled() ? aliPayProperties.getSandBoxInitialDelaySeconds() : intervalSeconds;
 
-        AliPayPollingTask task = new AliPayPollingTask(outTradeNo, maxPollingTimes, intervalSeconds, future);
+        AliPayPollingTask task = new AliPayPollingTask(
+                outTradeNo,
+                maxPollingTimes,
+                intervalSeconds,
+                future,
+                pollingExecutor,
+                this);
 
         // 延迟actualInitialDelay后开始第一次轮询
         pollingExecutor.schedule(task, actualInitialDelay, TimeUnit.SECONDS);
@@ -344,105 +348,53 @@ public class PaymentBizImpl implements PaymentBiz {
     }
 
     /**
-     * 支付宝支付轮询任务
+     * 发送支付成功通知给前端
      */
-    private class AliPayPollingTask implements Runnable {
-        private final String outTradeNo;
-        private final int maxPollingTimes;
-        private final int intervalSeconds;
-        private final CompletableFuture<AliPayStatusResponse> future;
-        private int currentPollingCount = 0;
+    private void sendPaymentSuccessNotification(String outTradeNo,
+                                                String orderStatus,
+                                                String totalAmount,
+                                                String payAmount) {
+        try {
+            Map<String, Object> message = new HashMap<>();
+            message.put("outTradeNo", outTradeNo);
+            message.put("tradeStatus", orderStatus);
+            message.put("totalAmount", totalAmount);
+            message.put("payAmount", payAmount);
 
-        public AliPayPollingTask(String outTradeNo,
-                                 int maxPollingTimes,
-                                 int intervalSeconds,
-                                 CompletableFuture<AliPayStatusResponse> future) {
-            this.outTradeNo = outTradeNo;
-            this.maxPollingTimes = maxPollingTimes;
-            this.intervalSeconds = intervalSeconds;
-            this.future = future;
-        }
-
-        @Override
-        public void run() {
-            currentPollingCount++;
-            log.info("开始第{}次轮询查询，订单号: {}", currentPollingCount, outTradeNo);
-
-            try {
-                AliPayStatusResponse response = aliPayStatus(outTradeNo);
-                String tradeStatus = response.getTradeState();
-
-                // 判断交易状态
-                if ("TRADE_SUCCESS".equals(tradeStatus)) {
-                    // 支付成功，完成Future
-                    future.complete(response);
-
-                    log.info("轮询查询到支付成功，订单号: {}", outTradeNo);
-                } else if ("TRADE_CLOSED".equals(tradeStatus) || "TRADE_FINISHED".equals(tradeStatus)) {
-                    // 交易已关闭或完成
-                    future.complete(response);
-
-                    log.info("轮询查询到交易已关闭/完成，订单号: {}", outTradeNo);
-                } else if ("WAIT_BUYER_PAY".equals(tradeStatus)) {
-                    // 等待买家付款
-                    if (currentPollingCount >= maxPollingTimes) {
-                        // 达到最大轮询次数，撤销交易
-//                        log.warn("达到最大轮询次数，准备撤销交易，订单号: {}", outTradeNo);
-//
-//                        // 达到最大轮询数撤销交易
-//                        cancelAliPay(outTradeNo);
-//
-//                        response.setTradeState("TRADE_CANCELED");
-
-                        future.complete(response);
-                    } else {
-                        // 继续轮询
-                        log.info("等待买家付款，继续轮询，订单号: {}", outTradeNo);
-
-                        pollingExecutor.schedule(this, intervalSeconds, TimeUnit.SECONDS);
-                    }
-                } else {
-                    // 其他状态
-                    future.complete(response);
-
-                    log.info("轮询查询到其他状态: {}，订单号: {}", tradeStatus, outTradeNo);
-                }
-            } catch (Exception e) {
-                log.error("轮询查询异常，订单号: {}", outTradeNo, e);
-
-                if (currentPollingCount >= maxPollingTimes) {
-                    future.completeExceptionally(e);
-                } else {
-                    // 异常情况下仍继续轮询
-                    pollingExecutor.schedule(this, intervalSeconds, TimeUnit.SECONDS);
-                }
-            }
+            messagingTemplate.convertAndSend("/topic/ws/pay/" + outTradeNo, message);
+            log.info("已发送支付结果通知，订单号: {}", outTradeNo);
+        } catch (Exception e) {
+            log.error("发送支付通知失败", e);
         }
     }
 
+    /**
+     * 映射微信、支付宝交易状态到自定义状态枚举
+     */
     private String getChargeState(String channel, String state) {
-        if (channel.equals(PayChannelEnum.ALI.getCode())) {
-            if (state.equals(AliPayStateEnum.TRADE_SUCCESS.getCode())) {
-                return MemberChargeStateEnum.SUCCESS.getCode();
-            } else if (state.equals(AliPayStateEnum.TRADE_CLOSED.getCode())) {
-                return MemberChargeStateEnum.CLOSED.getCode();
-            } else if (state.equals(AliPayStateEnum.WAIT_BUYER_PAY.getCode())) {
-                return MemberChargeStateEnum.WAIT_PAY.getCode();
-            } else if (state.equals(AliPayStateEnum.TRADE_FINISHED.getCode())) {
-                return MemberChargeStateEnum.FINISHED.getCode();
-            }
-        } else if (channel.equals(PayChannelEnum.WX.getCode())) {
-            if (state.equals(WechatPayStateEnum.SUCCESS.getCode())) {
-                return MemberChargeStateEnum.SUCCESS.getCode();
-            } else if (state.equals(WechatPayStateEnum.CLOSED.getCode())) {
-                return MemberChargeStateEnum.CLOSED.getCode();
-            } else if (state.equals(WechatPayStateEnum.REFUND.getCode())) {
-                return MemberChargeStateEnum.REFUND.getCode();
-            } else if (state.equals(WechatPayStateEnum.NOT_PAY.getCode())) {
-                return MemberChargeStateEnum.WAIT_PAY.getCode();
+        if (StringUtils.isNotEmpty(state)) {
+            if (channel.equals(PayChannelEnum.ALI.getCode())) {
+                if (state.equals(AliPayStateEnum.TRADE_SUCCESS.getCode())) {
+                    return MemberChargeStateEnum.SUCCESS.getCode();
+                } else if (state.equals(AliPayStateEnum.TRADE_CLOSED.getCode())) {
+                    return MemberChargeStateEnum.CLOSED.getCode();
+                } else if (state.equals(AliPayStateEnum.WAIT_BUYER_PAY.getCode())) {
+                    return MemberChargeStateEnum.WAIT_PAY.getCode();
+                } else if (state.equals(AliPayStateEnum.TRADE_FINISHED.getCode())) {
+                    return MemberChargeStateEnum.FINISHED.getCode();
+                }
+            } else if (channel.equals(PayChannelEnum.WX.getCode())) {
+                if (state.equals(WechatPayStateEnum.SUCCESS.getCode())) {
+                    return MemberChargeStateEnum.SUCCESS.getCode();
+                } else if (state.equals(WechatPayStateEnum.CLOSED.getCode())) {
+                    return MemberChargeStateEnum.CLOSED.getCode();
+                } else if (state.equals(WechatPayStateEnum.REFUND.getCode())) {
+                    return MemberChargeStateEnum.REFUND.getCode();
+                } else if (state.equals(WechatPayStateEnum.NOT_PAY.getCode())) {
+                    return MemberChargeStateEnum.WAIT_PAY.getCode();
+                }
             }
         }
-        return "";
+        return MemberChargeStateEnum.UNDEFINED.getCode();
     }
-
 }

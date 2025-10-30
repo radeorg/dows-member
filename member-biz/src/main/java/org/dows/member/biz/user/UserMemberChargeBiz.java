@@ -6,6 +6,8 @@ import org.dows.member.response.MemberChargeGetResponse;
 
 public interface UserMemberChargeBiz {
 
+    MemberChargeGetResponse getByPaNo(String payNo);
+    
     MemberChargeGetResponse save(UserMemberChargeSaveRequest request);
 
     void update(UserMemberChargeUpdateRequest request);

@@ -15,7 +15,9 @@ public enum MemberChargeStateEnum {
     FAILED("FAILED", "支付失败"),
     REFUND("REFUND", "已退款"),
     CLOSED("CLOSED", "已关闭"),
-    FINISHED("FINISHED", "交易结束"),;
+    CANCEL("CANCEL", "已撤销"),
+    FINISHED("FINISHED", "交易结束"),
+    UNDEFINED("UNDEFINED", "未知");
 
     private final String code;
     private final String description;
