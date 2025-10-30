@@ -1,7 +1,6 @@
 package org.dows.member.biz.user.impl;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.alibaba.fastjson2.JSON;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.dows.member.entity.MemberChangeEntity;
@@ -35,12 +34,10 @@ public class UserMemberChangeHandlerImpl implements UserMemberChangeHandler {
         entity.setNote(MemberChangeTypeEnum.getDescByCode(changeType));
         entity.setChangeType(changeType);
 
-        // 使用 ObjectMapper 进行 JSON 转换
-        ObjectMapper objectMapper = new ObjectMapper();
         String interestsInfo;
         try {
-            interestsInfo = objectMapper.writeValueAsString(interests);
-        } catch (JsonProcessingException e) {
+            interestsInfo = JSON.toJSONString(interests);
+        } catch (Exception e) {
             interestsInfo = "{}";
             log.error("对象转为JSON失败：" + e.getMessage());
         }

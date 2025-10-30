@@ -40,12 +40,17 @@ public class DueMemberScheduler {
             if (members.isEmpty()) return;
 
             members.forEach(m -> {
-                userMemberInstanceBiz.due(m.getMemberInstanceId());
+                try {
+                    userMemberInstanceBiz.due(m.getMemberInstanceId());
+                } catch (Exception e) {
+                    log.error("处理过期会员失败，会员ID: {}，错误信息: {}",
+                            m.getMemberInstanceId(), e.getMessage(), e);
+                }
             });
 
             log.info("处理完成过期会员：{}条记录", members.size());
         } catch (Exception e) {
-            log.error("处理异常", e);
+            log.error("过期会员处理异常", e);
         }
     }
 }

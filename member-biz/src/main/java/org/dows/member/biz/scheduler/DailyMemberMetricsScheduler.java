@@ -57,9 +57,14 @@ public class DailyMemberMetricsScheduler {
                 List<MemberInstanceGetResponse> batch = page.getRecords().subList(i, end);
 
                 futures.add(CompletableFuture.runAsync(() ->
-                        batch.forEach(record ->
-                                userMemberMetricsBiz.saveDailyMemberMetrics(record.getMemberInstanceId())
-                        ), dailyMemberMetricsTaskScheduler
+                        batch.forEach(record -> {
+                            try {
+                                userMemberMetricsBiz.saveDailyMemberMetrics(record.getMemberInstanceId());
+                            } catch (Exception e) {
+                                log.error("处理会员度量数据失败，会员ID: {}，错误信息: {}",
+                                        record.getMemberInstanceId(), e.getMessage(), e);
+                            }
+                        }), dailyMemberMetricsTaskScheduler
                 ));
             }
 
