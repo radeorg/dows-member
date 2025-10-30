@@ -32,7 +32,7 @@ public class WechatPayRest implements WechatPayApi {
     public PayQrCodeResponse wechatPayQrCode(PayQrCodeRequest request) {
         request.setAccountInstanceId(getAccountId());
         request.setAppId(AppContext.getAppId());
-        request.setPayChannel(PayChannelEnum.WECHAT.getCode());
+        request.setPayChannel(PayChannelEnum.WX.getCode());
 
         return paymentBiz.createNativePayment(request);
     }

@@ -3,6 +3,7 @@ package org.dows.member.biz.user.impl;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.dows.member.entity.MemberChangeEntity;
 import org.dows.member.entity.MemberInstanceEntity;
 import org.dows.member.entity.MemberInterestsEntity;
@@ -11,6 +12,7 @@ import org.dows.member.biz.user.UserMemberChangeHandler;
 import org.dows.member.service.MemberChangeService;
 import org.springframework.stereotype.Component;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class UserMemberChangeHandlerImpl implements UserMemberChangeHandler {
@@ -40,6 +42,7 @@ public class UserMemberChangeHandlerImpl implements UserMemberChangeHandler {
             interestsInfo = objectMapper.writeValueAsString(interests);
         } catch (JsonProcessingException e) {
             interestsInfo = "{}";
+            log.error("对象转为JSON失败：" + e.getMessage());
         }
         entity.setNewInterestsInfo(interestsInfo);
 

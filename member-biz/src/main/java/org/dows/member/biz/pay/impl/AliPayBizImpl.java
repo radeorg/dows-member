@@ -14,6 +14,7 @@ import com.alipay.api.response.AlipayTradePrecreateResponse;
 import com.alipay.api.response.AlipayTradeQueryResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.dows.member.exception.MemberException;
 import org.dows.member.config.AliPayConfig;
 import org.dows.member.config.AliPayProperties;
@@ -24,6 +25,8 @@ import org.dows.member.response.pay.AliPayStatusResponse;
 import org.dows.member.response.pay.PayQrCodeResponse;
 import org.springframework.stereotype.Component;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Map;
 
 @Slf4j
@@ -43,6 +46,7 @@ public class AliPayBizImpl implements AliPayBiz {
             model.setTotalAmount(qrCodeRequest.getTotalAmount().toString());
             model.setSubject(qrCodeRequest.getSubject());
             model.setTimeoutExpress(aliPayProperties.getTimeout());
+            model.setTimeExpire(getExpireTime(aliPayProperties.getTimeout()));
             model.setProductCode(aliPayProperties.getProductCode());
 
             AlipayTradePrecreateRequest request = new AlipayTradePrecreateRequest();
@@ -140,5 +144,20 @@ public class AliPayBizImpl implements AliPayBiz {
                 throw new AlipayApiException("支付宝订单撤销失败: " + response.getMsg());
             }
         }
+    }
+
+    /**
+     * 获取超时时间
+     * @param minutes 超时分钟数
+     * @return 格式化的超时时间字符串
+     */
+    private static String getExpireTime(String minutes) {
+        if (StringUtils.isEmpty(minutes)) {
+            return "";
+        }
+        int min = Integer.parseInt(minutes.replace("m", ""));
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        Date expireDate = new Date(System.currentTimeMillis() + (long) min * 60 * 1000);
+        return sdf.format(expireDate);
     }
 }

@@ -43,6 +43,7 @@ public class WechatPayBizImpl implements WechatPayBiz {
         prepayRequest.setDescription(request.getDescription());
         prepayRequest.setNotifyUrl(wechatPayProperties.getNotifyUrl());
         prepayRequest.setOutTradeNo(request.getOutTradeNo());
+        prepayRequest.setTimeExpire(PaymentTimeConverter.getWechatPayTimeString(wechatPayProperties.getCodeExpireTime()));
         try {
             PrepayResponse response = nativePayService.prepay(prepayRequest);
 
@@ -130,8 +131,7 @@ public class WechatPayBizImpl implements WechatPayBiz {
             response.setTotalAmount(amountToStr(transaction.getAmount().getTotal()));
         }
         response.setPayAmount(response.getTotalAmount());
-        response.setSuccessTime(paymentTimeConverter(transaction.getSuccessTime()));
-     //   response.setSuccessTime(PaymentTimeConverter.format(transaction.getSuccessTime()));
+        response.setSendPayDate(paymentTimeConverter(transaction.getSuccessTime()));
         response.setSuccess(true);
 
         return response;
@@ -141,10 +141,10 @@ public class WechatPayBizImpl implements WechatPayBiz {
         double tempResult = (double) amount / 100;
         return String.format("%.2f", tempResult);
     }
+
     private LocalDateTime paymentTimeConverter(String successTime){
         if (successTime != null){
-            LocalDateTime localDateTime2 = LocalDateTime.ofInstant(Instant.parse(successTime), ZoneId.systemDefault());
-            return localDateTime2;
+            return LocalDateTime.ofInstant(Instant.parse(successTime), ZoneId.systemDefault());
         }
       return null;
     }

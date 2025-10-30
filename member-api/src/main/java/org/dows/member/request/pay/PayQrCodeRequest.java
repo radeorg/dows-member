@@ -20,7 +20,7 @@ public class PayQrCodeRequest {
     private String appId;
 
     @NotEmpty(message = "支付渠道不能为空")
-    @Schema(description = "支付渠道（Wechat-微信，Ali-支付宝）")
+    @Schema(description = "支付渠道（WX-微信，ALI-支付宝）")
     private String payChannel;
 
     @Schema(description = "类型（RENEWAL续费，UP_GRADE升级）")

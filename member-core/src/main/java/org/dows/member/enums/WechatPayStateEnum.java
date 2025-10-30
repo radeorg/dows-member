@@ -13,10 +13,7 @@ public enum WechatPayStateEnum {
     SUCCESS("SUCCESS", "支付成功"),
     REFUND("REFUND", "转入退款"),
     NOT_PAY("NOTPAY", "未付款"),
-    CLOSED("CLOSED", "已关闭"),
-    REVOKED("REVOKED", "已撤销"),
-    USER_PAYING("USERPAYING", "用户支付中"),
-    PAY_ERROR("REVOKED", "支付失败");
+    CLOSED("CLOSED", "已关闭");
 
     private final String code;
     private final String description;

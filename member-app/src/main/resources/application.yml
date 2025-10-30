@@ -15,7 +15,7 @@ spring:
   application:
     name: dows-oss
   profiles:
-    include: mysql,apidoc,mybatis,caffeine,rade,feign,oss,mineru
+    include: mysql,apidoc,mybatis,caffeine,rade,feign,oss,mineru,member
     active: sit
 
   jackson:

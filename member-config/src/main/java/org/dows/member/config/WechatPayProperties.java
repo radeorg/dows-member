@@ -48,4 +48,7 @@ public class WechatPayProperties {
 
     /** 微信支付平台证书路径 */
     private String platformCertPath;
+
+    /** 微信二维码支付过期时间 */
+    private int codeExpireTime;
 }

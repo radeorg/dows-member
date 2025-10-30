@@ -37,16 +37,14 @@ public class UserMemberChargeBizImpl implements UserMemberChargeBiz {
             throw new MemberException("未查询到对应充值记录");
         }
 
-        String state = getChargeState(memberCharge, request.getState());
-
-        if (!memberCharge.getState().equals(state)) {
+        if (!memberCharge.getState().equals(request.getState())) {
             // 更新充值状态
             memberCharge.setTransactionId(request.getTransactionId());
             memberCharge.setChargeTime(request.getPayTime());
-            memberCharge.setState(state);
+            memberCharge.setState(request.getState());
             memberChargeService.updateById(memberCharge);
 
-            if (state.equals(MemberChargeStateEnum.SUCCESS.getCode())) {
+            if (request.getState().equals(MemberChargeStateEnum.SUCCESS.getCode())) {
                 if (memberCharge.getChargeType().equals(MemberChargeTypeEnum.RENEWAL.getCode())) {
                     userMemberInstanceBiz.renewal(memberCharge);
                 } else if (memberCharge.getChargeType().equals(MemberChargeTypeEnum.UP_GRADE.getCode())) {
@@ -73,23 +71,6 @@ public class UserMemberChargeBizImpl implements UserMemberChargeBiz {
                 .eq(MemberChargeEntity::getState, MemberChargeStateEnum.WAIT_PAY.getCode()));
 
         return BeanUtil.copyProperties(entity, MemberChargeGetResponse.class);
-    }
-
-    private String getChargeState(MemberChargeEntity entity, String state) {
-        if (entity.getChannel().equals(PayChannelEnum.ALI.getCode())) {
-            if (state.equals(AliPayStateEnum.TRADE_SUCCESS.getCode())) {
-                return MemberChargeStateEnum.SUCCESS.getCode();
-            } else if (state.equals(AliPayStateEnum.TRADE_CLOSED.getCode())) {
-                return MemberChargeStateEnum.CLOSED.getCode();
-            }
-        } else if (entity.getChannel().equals(PayChannelEnum.WECHAT.getCode())) {
-            if (state.equals(WechatPayStateEnum.SUCCESS.getCode())) {
-                return MemberChargeStateEnum.SUCCESS.getCode();
-            } else if (state.equals(WechatPayStateEnum.CLOSED.getCode())) {
-                return MemberChargeStateEnum.CLOSED.getCode();
-            }
-        }
-        return entity.getState();
     }
 
     private MemberChargeEntity getMemberChargeByPayNo(String payNo) {

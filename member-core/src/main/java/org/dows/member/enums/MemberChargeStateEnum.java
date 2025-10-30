@@ -13,8 +13,9 @@ public enum MemberChargeStateEnum {
     WAIT_PAY("WAIT_PAY", "待支付"),
     SUCCESS("SUCCESS", "支付完成"),
     FAILED("FAILED", "支付失败"),
-    REFUNDED("REFUNDED", "已退款"),
-    CLOSED("CLOSED", "已关闭"),;
+    REFUND("REFUND", "已退款"),
+    CLOSED("CLOSED", "已关闭"),
+    FINISHED("FINISHED", "交易结束"),;
 
     private final String code;
     private final String description;

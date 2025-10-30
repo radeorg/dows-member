@@ -38,7 +38,7 @@ public class DuePayScheduler {
 
     private void processDuePay() {
         try {
-            // 两分钟内未支付的订单进行撤销支付
+            // 15分钟未支付的订单进行撤销支付
             List<MemberChargeEntity> list = userMemberChargeHandler.listDuePayMemberCharge();
             if (list.isEmpty()) return;
 
@@ -49,7 +49,7 @@ public class DuePayScheduler {
                     } catch (Exception e) {
                         log.error("支付宝订单关闭失败：" + e.getMessage());
                     }
-                } else if (m.getChannel().equals(PayChannelEnum.WECHAT.getCode())) {
+                } else if (m.getChannel().equals(PayChannelEnum.WX.getCode())) {
                     try {
                         paymentBiz.closeWxPay(m.getPayNo());
                     } catch (Exception e) {

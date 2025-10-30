@@ -10,7 +10,7 @@ import java.util.Objects;
 @Getter
 public enum PayChannelEnum {
 
-    WECHAT("WECHAT", "微信"),
+    WX("WX", "微信"),
     ALI("ALI", "支付宝");
 
     private final String code;

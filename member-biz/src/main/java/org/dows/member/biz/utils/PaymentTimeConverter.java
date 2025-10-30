@@ -3,6 +3,7 @@ package org.dows.member.biz.utils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -106,5 +107,21 @@ public class PaymentTimeConverter {
      */
     public static LocalDateTime now() {
         return LocalDateTime.now();
+    }
+
+    /**
+     * 获取当前时间加指定分钟后的微信支付格式时间字符串
+     *  @return 格式如：2015-05-20T13:29:35+08:00
+     */
+    public static String getWechatPayTimeString(int addMinute) {
+        // 获取当前时间（使用系统默认时区）
+        OffsetDateTime now = OffsetDateTime.now();
+
+        // 加上五分钟
+        OffsetDateTime timePlusFiveMinutes = now.plusMinutes(addMinute);
+        // 格式化为微信支付要求的格式
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssXXX");
+
+        return timePlusFiveMinutes.format(formatter);
     }
 }

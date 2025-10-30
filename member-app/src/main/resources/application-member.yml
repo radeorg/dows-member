@@ -1,0 +1,33 @@
+wx:
+  pay:
+    merchant-id: 1730672512 # 替换为实际商户号
+    app-id: wx33a03e8c98247aef  # 替换为实际APPID
+    public_Key_id: PUB_KEY_ID_0117306725122025102700292200000400
+    private-key-path: classpath:/cert/wx/apiclient_key.pem  # 私钥文件路径
+    pub-key-path: classpath:/cert/wx/pub_key.pem  # 公钥文件路径
+    merchant-serial-number: 66398557F3B88413DC6E4A47169F95F6D77F484B  # 证书序列号
+    api-v3-key: f8e3a7b2d9c4e1f0a5b6c7d8e9f0a1b2  # APIv3密钥
+    notify-url: https://dev.bole.hioas.com/api/v1/wx/pay/notify  # 回调通知地址
+    return-url:    # 支付成功跳转地址
+    code-expire-time: 15 # 二维码过期时间，单位：分钟，超出时间为支付自动关闭订单
+ali:
+  pay:
+    app-id: 9021000157611719
+    product-code: FACE_TO_FACE_PAYMENT
+    public-key: MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAhw083mPJFLTKnk8pdlabN7IODiJjseMqQos2LH7k7f4xvAiu9S1siI63albBE/iSsUTBC52WkHEiHFtMigzWpqQGJ/7BADRXZy3BSg0hu72d5UGJh2XssPlza/ouLcprASPJbAzSUI5y10ZfUJ+0jk6DnbWLuu9G13TjOtoJ4cWZpQru9y7aP7QUhA6nJ2xEn9m6B+JOmZJF/a0ykGI6H2MyesiqR5D+4Vv7cVrYhbHtoIzhWF2ssmOGxCLndg0cceAhG3ZIerOxKjqtAJt4gRSZR1E2QqRT6kWIn/4YkO+52R4kO8buetrHPXluJdxyw2ldb+YExQfw0kO7mOfxOwIDAQAB
+    private-key: MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCHDTzeY8kUtMqeTyl2Vps3sg4OImOx4ypCizYsfuTt/jG8CK71LWyIjrdqVsET+JKxRMELnZaQcSIcW0yKDNampAYn/sEANFdnLcFKDSG7vZ3lQYmHZeyw+XNr+i4tymsBI8lsDNJQjnLXRl9Qn7SOToOdtYu670bXdOM62gnhxZmlCu73Lto/tBSEDqcnbESf2boH4k6ZkkX9rTKQYjofYzJ6yKpHkP7hW/txWtiFse2gjOFYXayyY4bEIud2DRxx4CEbdkh6s7EqOq0Am3iBFJlHUTZCpFPqRYif/hiQ77nZHiQ7xu562sc9eW4l3HLDaV1v5gTFB/DSQ7uY5/E7AgMBAAECggEAYIqdBZktiGjJIywRxq+Ym9Lj60S4IdTzQ8iCfIJloqAA65sFfuzu1hu3kAPeWClsq94rZeNMW4sUSFMXvuP4mf1NDVA2pa/E/1QdBZOnlq6w7c7QwoKhFc3srbaVRlSZ86GifmQYAFAkVjHPNzJDfysvORErhwE/kgvT2CE/yS1JSwyt4LLE1MaPnTuLtCJCFdOCktEFd3VE8/93izw4DDM2JMSH85x0FfMjt0ssQfWWEtEsqjtP0jEF5v9CmjJ3rTbBi86e/QuZ2WzSLQTWV2zFYhie/VjCVdzas4daA0HP9d31P/QfZJHZJAh9pu46+5hvJSyZ5lOCjaqY46OS8QKBgQDnCjPfz1x5SekHVb5FrPnrNAs2FOgaFh8v9bjxX1OuWRoT6I+Rwms+pHdE4MjYpEuVSAvIXzOInmRiIgTfKtxwI+jh1h9NV1kzmxWl1WKD6b2UH5iiZ+2vt3hcj2q+qJtcKwZlQG9VQDW0R7JYKaJi+uV/01sC8IhJF5H6gBZokwKBgQCVpFImXbll85rzt9WzX95DipWO5HjAtyvUGLo4W30o2dMkVKsy3lWonmHEVoiuBgii9DXB+niBTYmJ3bBdY0QHTeoNUWpED9ZGeQbViAuqMUJv2mJDEcHiIjSEPbjNDgSqwE5RZ8fL5BDtAVegIKckSr65R/S+AFZGM0ldkVaFuQKBgQCwf9jVN8J7Xf1JfzVWYSijiCSwchRGKXQ13VAmBR8WaDdF0jorrgzj1BzRX6/P4ONk7Z8iuafSzL3/QeHa4xF4EdbNABj1qq8Yf3dwMq2J/Ly5NdIS77ZisJSgkWeIs6HMLYo7O5hR1jWwvbz/IP9PAkDk///dJQfYXstERSnZRQKBgCDG7GOQ9fIZ6N/nbXyrzBB5Q4cYDkcQGB6OCAQeLg0LoU786L7sqlCT2JBb7/ZGRhADc974UPrpk+3JzD64Zoc/Drw6EA+2dFXdXpzY/s0ZmxbK++j687/nhB9PMbJglq8cDkuQctf7LaXsPFhLrrCpWptU4ovXoQ4hX7mKAyypAoGAIcC1SQISrJxPgDzvf/YvRK38DBe0PwimFN1/qUD7CgjhUWzwCMdCGz4jhzKpndi4ZA/sSx7TY3kBr/LBOR/4EnBL1cXEQ0iVtuml3BMIPMadqsn2VUh0M6e/cwkHo0XVpGx8GzePl5GMwC0Hrm10V8IHgrEXzR91abgHQsicRLk=
+    cert-path: classpath:/cert/ali/appPublicCert.crt
+    ali-pay-public-cert-path: classpath:/cert/ali/alipayPublicCert.crt
+    root-cert-path: classpath:/cert/ali/alipayRootCert.crt
+    server-url: https://openapi-sandbox.dl.alipaydev.com/gateway.do
+    notify-url: https://dev.bole.hioas.com/api/v1/ali/pay/notify  # 回调通知地址
+    return-url:      # 支付成功跳转地址
+    timeout: 15m # 二维码过期时间，单位：分钟，超出时间为支付自动关闭订单
+    # 轮询配置
+    polling:
+      max-times: 12                # 最大轮询次数
+      interval-seconds: 5          # 轮询间隔秒数
+    # 沙箱环境配置
+    sandbox:
+      enabled: true                # 是否启用沙箱环境适配（true/false）
+      initial-delay-seconds: 30     # 沙箱环境首次轮询延迟秒数（给订单创建留时间）

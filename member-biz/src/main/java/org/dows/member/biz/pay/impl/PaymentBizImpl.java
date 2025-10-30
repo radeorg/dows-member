@@ -8,10 +8,7 @@ import org.dows.member.biz.pay.WechatPayBiz;
 import org.dows.member.constant.MemberExceptionStatusCode;
 import org.dows.member.entity.MemberInstanceEntity;
 import org.dows.member.entity.MemberInterestsEntity;
-import org.dows.member.enums.AliPayStateEnum;
-import org.dows.member.enums.MemberChargeTypeEnum;
-import org.dows.member.enums.MemberTypeEnum;
-import org.dows.member.enums.PayChannelEnum;
+import org.dows.member.enums.*;
 import org.dows.member.exception.MemberException;
 import org.dows.member.config.AliPayProperties;
 import org.dows.member.biz.pay.AliPayBiz;
@@ -29,16 +26,11 @@ import org.dows.member.response.pay.PayQrCodeResponse;
 import org.dows.member.response.pay.WxPayStatusResponse;
 import org.dows.member.service.MemberInstanceService;
 import org.dows.member.service.MemberInterestsService;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -78,7 +70,7 @@ public class PaymentBizImpl implements PaymentBiz {
         // 查询是否还有待支付的充值记录，有的话则关闭
         MemberChargeGetResponse chargeGetResponse = userMemberChargeBiz.getWaitPayByAccountInstanceId(request.getAccountInstanceId());
         if (chargeGetResponse != null) {
-            if (chargeGetResponse.getChannel().equals(PayChannelEnum.WECHAT.getCode())) {
+            if (chargeGetResponse.getChannel().equals(PayChannelEnum.WX.getCode())) {
                 closeWxPay(chargeGetResponse.getPayNo());
             } else if (chargeGetResponse.getChannel().equals(PayChannelEnum.ALI.getCode())){
                 cancelAliPay(chargeGetResponse.getPayNo());
@@ -100,7 +92,7 @@ public class PaymentBizImpl implements PaymentBiz {
                 MemberChargeTypeEnum.getDescByCode(chargeType) + "(" + memberType + ")");
 
         // 调用第三方支付
-        if (request.getPayChannel().equals(PayChannelEnum.WECHAT.getCode())) {
+        if (request.getPayChannel().equals(PayChannelEnum.WX.getCode())) {
             WxPayQrCodeRequest payQrCodeRequest = new WxPayQrCodeRequest();
             payQrCodeRequest.setOutTradeNo(chargeEntity.getPayNo());
             payQrCodeRequest.setTotalAmount(interests.getAmount());
@@ -163,12 +155,18 @@ public class PaymentBizImpl implements PaymentBiz {
     public AliPayStatusResponse aliPayStatus(String outTradeNo) {
         AliPayStatusResponse orderStatus = aliPayBiz.aliPayStatus(outTradeNo);
 
+        String state = getChargeState(PayChannelEnum.ALI.getCode(), orderStatus.getTradeState());
+
         UserMemberChargeUpdateRequest chargeUpdateRequest = new UserMemberChargeUpdateRequest();
         chargeUpdateRequest.setPayNo(outTradeNo);
-        chargeUpdateRequest.setState(orderStatus.getTradeState());
+        chargeUpdateRequest.setState(state);
         chargeUpdateRequest.setTransactionId(orderStatus.getTradeNo());
         chargeUpdateRequest.setPayTime(orderStatus.getSendPayDate());
         userMemberChargeBiz.update(chargeUpdateRequest);
+
+        // 统一转成本系统的支付状态
+        orderStatus.setTradeState(state);
+        orderStatus.setTradeStateDesc(MemberChargeStateEnum.getDescByCode(state));
 
         return orderStatus;
     }
@@ -190,12 +188,18 @@ public class PaymentBizImpl implements PaymentBiz {
     public WxPayStatusResponse wxPayStatus(String outTradeNo) {
         WxPayStatusResponse orderStatus = wechatPayBiz.wxPayStatus(outTradeNo);
 
+        String state = getChargeState(PayChannelEnum.WX.getCode(), orderStatus.getTradeState());
+
         UserMemberChargeUpdateRequest chargeUpdateRequest = new UserMemberChargeUpdateRequest();
         chargeUpdateRequest.setPayNo(orderStatus.getOutTradeNo());
-        chargeUpdateRequest.setState(orderStatus.getTradeState());
+        chargeUpdateRequest.setState(state);
         chargeUpdateRequest.setTransactionId(orderStatus.getTradeNo());
-        chargeUpdateRequest.setPayTime(orderStatus.getSuccessTime());
+        chargeUpdateRequest.setPayTime(orderStatus.getSendPayDate());
         userMemberChargeBiz.update(chargeUpdateRequest);
+
+        // 统一转成本系统的支付状态
+        orderStatus.setTradeState(state);
+        orderStatus.setTradeStateDesc(MemberChargeStateEnum.getDescByCode(state));
 
         return orderStatus;
     }
@@ -383,12 +387,12 @@ public class PaymentBizImpl implements PaymentBiz {
                     // 等待买家付款
                     if (currentPollingCount >= maxPollingTimes) {
                         // 达到最大轮询次数，撤销交易
-                        log.warn("达到最大轮询次数，准备撤销交易，订单号: {}", outTradeNo);
-
-                        // 达到最大轮询数撤销交易
-                        cancelAliPay(outTradeNo);
-
-                        response.setTradeState("TRADE_CANCELED");
+//                        log.warn("达到最大轮询次数，准备撤销交易，订单号: {}", outTradeNo);
+//
+//                        // 达到最大轮询数撤销交易
+//                        cancelAliPay(outTradeNo);
+//
+//                        response.setTradeState("TRADE_CANCELED");
 
                         future.complete(response);
                     } else {
@@ -415,4 +419,30 @@ public class PaymentBizImpl implements PaymentBiz {
             }
         }
     }
+
+    private String getChargeState(String channel, String state) {
+        if (channel.equals(PayChannelEnum.ALI.getCode())) {
+            if (state.equals(AliPayStateEnum.TRADE_SUCCESS.getCode())) {
+                return MemberChargeStateEnum.SUCCESS.getCode();
+            } else if (state.equals(AliPayStateEnum.TRADE_CLOSED.getCode())) {
+                return MemberChargeStateEnum.CLOSED.getCode();
+            } else if (state.equals(AliPayStateEnum.WAIT_BUYER_PAY.getCode())) {
+                return MemberChargeStateEnum.WAIT_PAY.getCode();
+            } else if (state.equals(AliPayStateEnum.TRADE_FINISHED.getCode())) {
+                return MemberChargeStateEnum.FINISHED.getCode();
+            }
+        } else if (channel.equals(PayChannelEnum.WX.getCode())) {
+            if (state.equals(WechatPayStateEnum.SUCCESS.getCode())) {
+                return MemberChargeStateEnum.SUCCESS.getCode();
+            } else if (state.equals(WechatPayStateEnum.CLOSED.getCode())) {
+                return MemberChargeStateEnum.CLOSED.getCode();
+            } else if (state.equals(WechatPayStateEnum.REFUND.getCode())) {
+                return MemberChargeStateEnum.REFUND.getCode();
+            } else if (state.equals(WechatPayStateEnum.NOT_PAY.getCode())) {
+                return MemberChargeStateEnum.WAIT_PAY.getCode();
+            }
+        }
+        return "";
+    }
+
 }

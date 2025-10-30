@@ -3,6 +3,7 @@ package org.dows.member.biz.user.impl;
 import cn.hutool.core.bean.BeanUtil;
 import com.mybatisflex.core.query.QueryWrapper;
 import lombok.RequiredArgsConstructor;
+import org.dows.member.biz.util.OrderNumberGenerator;
 import org.dows.member.entity.MemberChargeEntity;
 import org.dows.member.enums.MemberChargeStateEnum;
 import org.dows.member.biz.user.UserMemberChargeHandler;
@@ -28,8 +29,7 @@ public class UserMemberChargeHandlerImpl implements UserMemberChargeHandler {
         entity.setMemberInstanceId(request.getMemberInstanceId());
         entity.setMemberInterestsId(request.getMemberInterestsId());
         entity.setAmount(request.getAmount());
-        // TODO 后面需要更改成新的订单规则
-        entity.setPayNo(System.currentTimeMillis() + "");
+        entity.setPayNo(OrderNumberGenerator.generateOrderNo(request.getChannel()));
         entity.setChannel(request.getChannel());
         entity.setNote(request.getNote());
         entity.setChargeType(request.getChargeType());
@@ -45,7 +45,7 @@ public class UserMemberChargeHandlerImpl implements UserMemberChargeHandler {
         // 获取当前时间
         LocalDateTime now = LocalDateTime.now();
         // 减去N分钟
-        LocalDateTime fifteenMinutesAgo = now.minusMinutes(2);
+        LocalDateTime fifteenMinutesAgo = now.minusMinutes(15);
 
         // 查询小于等于15分钟还未支付的订单
         return memberChargeService.list(QueryWrapper.create()

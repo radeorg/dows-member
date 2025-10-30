@@ -18,6 +18,9 @@ public class AliPayStatusResponse {
     @Schema(description = "支付状态")
     private String tradeState;
 
+    @Schema(description = "状态描述")
+    private String tradeStateDesc;
+
     @Schema(description = "订单金额")
     private String totalAmount;
 

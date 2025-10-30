@@ -29,7 +29,7 @@ public class WxPayStatusResponse {
     private String tradeStateDesc;
 
     @Schema(description = "支付成功时间")
-    private LocalDateTime successTime;
+    private LocalDateTime sendPayDate;
 
     @Schema(description = "信息")
     private String message;
