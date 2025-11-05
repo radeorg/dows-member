@@ -224,7 +224,7 @@ public class UserMemberInstanceBizImpl implements UserMemberInstanceBiz {
 
     private LocalDateTime addDate(LocalDateTime dateTime, Integer addDays){
         if (dateTime == null) {
-            return null;
+            dateTime = LocalDateTime.now();
         }
         return dateTime.plusDays(addDays);
     }

@@ -111,7 +111,7 @@ public class PaymentBizImpl implements PaymentBiz {
             PayQrCodeResponse response = aliPayBiz.aliPayQrCode(payQrCodeRequest);
 
             // 发起轮询
-            startPaymentPolling(response.getOutTradeNo());
+//            startPaymentPolling(response.getOutTradeNo());
 
             return response;
         }
