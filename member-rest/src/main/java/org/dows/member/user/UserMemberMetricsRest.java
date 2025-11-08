@@ -32,13 +32,8 @@ public class UserMemberMetricsRest implements UserMemberMetricsApi {
     }
 
     @Override
-    public void subUsedActiveInviteCountByGiveUp() {
-        userMemberMetricsHandler.subUsedActiveInviteCount(getAccountId());
-    }
-
-    @Override
     public void subUsedActiveInviteCount(Long accountInstanceId) {
-        userMemberMetricsHandler.subUsedActiveInviteCount(getAccountId());
+        userMemberMetricsHandler.subUsedActiveInviteCount(accountInstanceId);
     }
 
     @Override

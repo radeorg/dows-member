@@ -12,8 +12,7 @@ public enum MemberExceptionStatusCode implements StatusCode {
     INTERESTS_TYPE_HAS_EXIST("MEMBER001002", "会员权益等级已存在"),
     MEMBER_INSTANCE_NOT_FOUND("MEMBER002001", "会员不存在"),
     MEMBER_INSTANCE_EXIST("MEMBER002002", "会员已存在"),
-    METRICS_NOT_FOUND("MEMBER003001", "会员度量不存在"),
-    METRICS_ACTIVE_INVITE_LOWER_LIMIT("MEMBER003004", "同时邀约次数已达上限");
+    METRICS_NOT_FOUND("MEMBER003001", "会员度量不存在"),;
 
     private final String code;
     private final String describe;

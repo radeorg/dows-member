@@ -96,12 +96,11 @@ public class UserMemberMetricsHandlerImpl implements UserMemberMetricsHandler {
 
         isExist(entity);
 
-        if (entity.getUsedInterviewCount() == 0) {
-            throw new MemberException(MemberExceptionStatusCode.METRICS_ACTIVE_INVITE_LOWER_LIMIT);
-        }
-        entity.setUsedInterviewCount(entity.getUsedInterviewCount() - 1);
+        if (entity.getUsedInterviewCount() > 0) {
+            entity.setUsedInterviewCount(entity.getUsedInterviewCount() - 1);
 
-        memberMetricsService.updateById(entity);
+            memberMetricsService.updateById(entity);
+        }
     }
 
     @Override
