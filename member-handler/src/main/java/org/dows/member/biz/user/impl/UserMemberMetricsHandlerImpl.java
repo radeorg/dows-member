@@ -195,7 +195,7 @@ public class UserMemberMetricsHandlerImpl implements UserMemberMetricsHandler {
 
     private void validateInterview(MemberMetricsEntity entity) {
         if (entity.getUsedInterviewCount() >= entity.getActiveInterviewCount()) {
-            throw new MemberException("当前最多可同时进行 " + entity.getActiveInterviewCount() + " 个邀约");
+            throw new MemberException("当前最多可同时进行 " + entity.getActiveInterviewCount() + " 个面试");
         }
     }
 
