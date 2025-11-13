@@ -35,7 +35,8 @@ public class UserMemberInstanceHandlerImpl implements UserMemberInstanceHandler 
     @Override
     public List<MemberInstanceGetResponse> listDueMemberInstance() {
         List<MemberInstanceEntity> entities = memberInstanceService.list(QueryWrapper.create()
-                .le(MemberInstanceEntity::getExpiryDate, new Date()));
+                .le(MemberInstanceEntity::getExpiryDate, new Date())
+                .isNotNull(MemberInstanceEntity::getExpiryDate));
 
         return BeanUtil.copyToList(entities, MemberInstanceGetResponse.class);
     }

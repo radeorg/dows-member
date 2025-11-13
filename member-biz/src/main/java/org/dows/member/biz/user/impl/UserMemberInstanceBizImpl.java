@@ -226,6 +226,6 @@ public class UserMemberInstanceBizImpl implements UserMemberInstanceBiz {
         if (dateTime == null) {
             dateTime = LocalDateTime.now();
         }
-        return dateTime.plusDays(addDays);
+        return addDays == null ? null : dateTime.plusDays(addDays);
     }
 }
