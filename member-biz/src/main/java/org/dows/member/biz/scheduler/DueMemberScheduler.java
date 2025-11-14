@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.dows.member.biz.user.UserMemberInstanceBiz;
 import org.dows.member.biz.user.UserMemberInstanceHandler;
 import org.dows.member.response.MemberInstanceGetResponse;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.scheduling.support.CronTrigger;
@@ -21,6 +22,9 @@ import java.util.List;
 @Slf4j
 public class DueMemberScheduler {
 
+    @Value("${dows.member.scheduler.due-member.cron:0 0 0 * * ?}")
+    private String dueMemberCron;
+
     private final UserMemberInstanceHandler userMemberInstanceHandler;
     private final UserMemberInstanceBiz userMemberInstanceBiz;
     private final ThreadPoolTaskScheduler dueMemberTaskScheduler;
@@ -30,8 +34,8 @@ public class DueMemberScheduler {
      */
     @PostConstruct
     public void init() {
-        dueMemberTaskScheduler.schedule(this::processDueMembers, new CronTrigger("0 */10 * * * ?"));
-        log.info("DueMemberScheduler定时任务注册成功，执行频率：每隔10分钟");
+        dueMemberTaskScheduler.schedule(this::processDueMembers, new CronTrigger(dueMemberCron));
+        log.info("DueMemberScheduler定时任务注册成功，执行频率：每日凌晨执行");
     }
 
     private void processDueMembers() {

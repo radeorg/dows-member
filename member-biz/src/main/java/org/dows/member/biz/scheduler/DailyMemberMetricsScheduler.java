@@ -9,6 +9,7 @@ import org.dows.member.biz.admin.AdminMemberInstanceHandler;
 import org.dows.member.biz.user.UserMemberMetricsBiz;
 import org.dows.member.request.admin.AdminMemberInstanceQueryRequest;
 import org.dows.member.response.MemberInstanceGetResponse;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.scheduling.support.CronTrigger;
@@ -25,6 +26,9 @@ import java.util.concurrent.CompletableFuture;
 @Slf4j
 public class DailyMemberMetricsScheduler {
 
+    @Value("${dows.member.scheduler.daily-metrics.cron:0 0 0 * * ?}")
+    private String dailyMetrics;
+
     private static final int PAGE_SIZE = 100; // 每页大小
     private static final int BATCH_SIZE = 20; // 每个线程处理的条数
     private final UserMemberMetricsBiz userMemberMetricsBiz;
@@ -34,7 +38,7 @@ public class DailyMemberMetricsScheduler {
     // 初始化时注册定时任务（替代@Scheduled注解）
     @PostConstruct
     public void init() {
-        dailyMemberMetricsTaskScheduler.schedule(this::processAllData, new CronTrigger("0 0 0 * * ?"));
+        dailyMemberMetricsTaskScheduler.schedule(this::processAllData, new CronTrigger(dailyMetrics));
         log.info("DailyMemberMetricsScheduler定时任务注册成功，执行频率：每日凌晨");
     }
 

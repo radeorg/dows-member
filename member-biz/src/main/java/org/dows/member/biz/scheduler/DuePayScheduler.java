@@ -7,6 +7,7 @@ import org.dows.member.entity.MemberChargeEntity;
 import org.dows.member.enums.PayChannelEnum;
 import org.dows.member.biz.pay.PaymentBiz;
 import org.dows.member.biz.user.UserMemberChargeHandler;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.scheduling.support.CronTrigger;
@@ -21,10 +22,12 @@ import java.util.List;
 @Slf4j
 public class DuePayScheduler {
 
+    @Value("${dows.member.scheduler.due-pay.cron:0 */5 * * * ?}")
+    private String duePayCron;
+
     private final UserMemberChargeHandler userMemberChargeHandler;
     private final ThreadPoolTaskScheduler duePayTaskScheduler;
     private final PaymentBiz paymentBiz;
-   // private final WechatPayBiz wechatPayBiz;
 
     /**
      * 初始化时注册定时任务
@@ -32,7 +35,7 @@ public class DuePayScheduler {
     @PostConstruct
     public void init() {
         // 订单创建时间需超过5分钟才能关闭 (微信支付限制)
-        duePayTaskScheduler.schedule(this::processDuePay, new CronTrigger("0 */5 * * * ?"));
+        duePayTaskScheduler.schedule(this::processDuePay, new CronTrigger(duePayCron));
         log.info("DuePayScheduler，执行频率：每隔5分钟");
     }
 
