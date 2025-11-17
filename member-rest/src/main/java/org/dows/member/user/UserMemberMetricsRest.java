@@ -67,8 +67,8 @@ public class UserMemberMetricsRest implements UserMemberMetricsApi {
     }
 
     @Override
-    public void validatePushEmailPermission() {
-        userMemberMetricsHandler.validatePushEmailPermission(getAccountId());
+    public void validatePushEmailPermission(Long accountInstanceId) {
+        userMemberMetricsHandler.validatePushEmailPermission(accountInstanceId);
     }
 
     private Long getAccountId() {

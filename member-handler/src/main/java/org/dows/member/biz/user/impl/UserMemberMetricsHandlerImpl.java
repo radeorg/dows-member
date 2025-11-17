@@ -44,7 +44,7 @@ public class UserMemberMetricsHandlerImpl implements UserMemberMetricsHandler {
         } else {
             if (!CommonUtils.isToday(metrics.getTs())) {
                 // 如果今日未生成校验数据，将历史使用的次数进行赋值
-                entity.setUsedMatchCount(metrics.getUsedMatchCount());
+                entity.setUsedMatchCount(0);
                 entity.setUsedInterviewCount(metrics.getUsedInterviewCount());
                 entity.setUsedCreationJdCount(metrics.getUsedCreationJdCount());
 

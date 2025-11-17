@@ -38,5 +38,5 @@ public interface UserMemberMetricsApi {
     void validateInterviewPermission();
 
     @Operation(summary = "推送邮箱权限校验")
-    void validatePushEmailPermission();
+    void validatePushEmailPermission(Long accountInstanceId);
 }
