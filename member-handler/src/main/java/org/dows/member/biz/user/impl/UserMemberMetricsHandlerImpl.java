@@ -117,6 +117,19 @@ public class UserMemberMetricsHandlerImpl implements UserMemberMetricsHandler {
     }
 
     @Override
+    public void subUsedCreationJdCount(Long accountInstanceId) {
+        MemberMetricsEntity entity = getNewestByAccountInstanceId(accountInstanceId);
+
+        isExist(entity);
+
+        if (entity.getUsedCreationJdCount() > 0) {
+            entity.setUsedCreationJdCount(entity.getUsedCreationJdCount() - 1);
+
+            memberMetricsService.updateById(entity);
+        }
+    }
+
+    @Override
     public MemberMetricsGetResponse getNewest(Long accountInstanceId, String appId) {
         MemberMetricsEntity entity = memberMetricsService.getOne(QueryWrapper.create()
                 .eq(MemberMetricsEntity::getAccountInstanceId, accountInstanceId)

@@ -33,6 +33,11 @@ public interface UserMemberMetricsHandler {
     void addUsedCreationJdCount(Long accountInstanceId);
 
     /**
+     * 已创建JD次数减一
+     */
+    void subUsedCreationJdCount(Long accountInstanceId);
+
+    /**
      * 获取账号最新一条会员度量数据
      */
     MemberMetricsGetResponse getNewest(Long accountInstanceId, String appId);

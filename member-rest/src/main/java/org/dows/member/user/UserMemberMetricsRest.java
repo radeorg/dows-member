@@ -42,6 +42,11 @@ public class UserMemberMetricsRest implements UserMemberMetricsApi {
     }
 
     @Override
+    public void subUsedCreationJdCount() {
+        userMemberMetricsHandler.subUsedCreationJdCount(getAccountId());
+    }
+
+    @Override
     public MemberMetricsGetResponse getNewest() {
         return userMemberMetricsHandler.getNewest(getAccountId(), AppContext.getAppId());
     }

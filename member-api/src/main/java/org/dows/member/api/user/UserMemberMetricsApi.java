@@ -25,6 +25,9 @@ public interface UserMemberMetricsApi {
     @Operation(summary = "已创建JD次数加一")
     void addUsedCreationJdCount();
 
+    @Operation(summary = "已创建JD次数减一")
+    void subUsedCreationJdCount();
+
     @Operation(summary = "简历上传权限校验")
     void validateUploadPermission(int uploadNum);
 
