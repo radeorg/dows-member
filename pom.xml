@@ -18,6 +18,7 @@
 
   <properties>
     <revision>1.0.0-SNAPSHOT</revision>
+    <hrm.version>1.0.1-SNAPSHOT</hrm.version>
     <mybatis-flex.ext.version>1.10.8.110</mybatis-flex.ext.version>
     <jdk.version>21</jdk.version>
   </properties>
@@ -81,6 +82,11 @@
         <artifactId>member-dao</artifactId>
         <groupId>org.dows.cloud</groupId>
         <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <artifactId>hrm-api</artifactId>
+        <groupId>org.dows.cloud</groupId>
+        <version>${hrm.version}</version>
       </dependency>
 
       <dependency>

@@ -2,6 +2,7 @@ package org.dows.member.biz.user.impl;
 
 import com.mybatisflex.core.query.QueryWrapper;
 import lombok.RequiredArgsConstructor;
+import org.dows.hrm.api.EmailSettingApi;
 import org.dows.member.constant.MemberExceptionStatusCode;
 import org.dows.member.entity.MemberChargeEntity;
 import org.dows.member.entity.MemberInstanceEntity;
@@ -29,6 +30,7 @@ public class UserMemberInstanceBizImpl implements UserMemberInstanceBiz {
     private final MemberInterestsService memberInterestsService;
     private final UserMemberMetricsHandler userMemberMetricsHandler;
     private final UserMemberChangeHandler userMemberChangeHandler;
+    private final EmailSettingApi emailSettingApi;
 
     @Transactional
     @Override
@@ -83,6 +85,9 @@ public class UserMemberInstanceBizImpl implements UserMemberInstanceBiz {
 
         // 更新或新增会员度量表
         userMemberMetricsHandler.saveOrUpdate(oldInstance, interests);
+
+        // 邮箱配置设置为重连，继续读取邮件
+        emailSettingApi.reconnect();
     }
 
     @Transactional
@@ -111,6 +116,9 @@ public class UserMemberInstanceBizImpl implements UserMemberInstanceBiz {
 
         // 更新或新增会员度量表
         userMemberMetricsHandler.saveOrUpdate(oldInstance, interests);
+
+        // 邮箱配置设置为重连，继续读取邮件
+        emailSettingApi.reconnect();
     }
 
     @Transactional
@@ -138,6 +146,9 @@ public class UserMemberInstanceBizImpl implements UserMemberInstanceBiz {
 
             // 更新或新增会员度量表
             userMemberMetricsHandler.saveOrUpdate(oldInstance, interests);
+
+            // 邮箱配置设置为断开，不继续读取邮件
+            emailSettingApi.disconnect(newInstance.getAccountInstanceId());
         }
     }
 
