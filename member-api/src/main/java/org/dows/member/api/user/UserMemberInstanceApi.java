@@ -14,10 +14,10 @@ public interface UserMemberInstanceApi {
     @Operation(summary = "新增会员")
     Long save(@RequestBody UserMemberInstanceSaveRequest request);
 
-//
-//    @Operation(summary = "到期")
-//    @PostMapping("/due")
-//    Boolean due(@RequestParam("memberInstanceId") Long memberInstanceId);
+
+    @Operation(summary = "到期")
+    @PostMapping("/due")
+    Boolean due(@RequestParam("memberInstanceId") Long memberInstanceId);
 
     @GetMapping("/get")
     @Operation(summary = "获取当前登录用户会员等级详情")

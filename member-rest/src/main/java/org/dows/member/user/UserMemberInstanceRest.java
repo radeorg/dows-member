@@ -29,11 +29,11 @@ public class UserMemberInstanceRest implements UserMemberInstanceApi {
         return userMemberInstanceBiz.save(request);
     }
 
-//    @Override
-//    public Boolean due(Long memberInstanceId) {
-//        userMemberInstanceBiz.due(memberInstanceId);
-//        return true;
-//    }
+    @Override
+    public Boolean due(Long memberInstanceId) {
+        userMemberInstanceBiz.due(memberInstanceId);
+        return true;
+    }
 
     @Override
     public MemberInstanceGetResponse get() {
