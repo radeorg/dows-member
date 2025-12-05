@@ -151,8 +151,12 @@ public class PaymentBizImpl implements PaymentBiz {
     @Override
     public void cancelAliPay(String outTradeNo) {
         try {
-            aliPayBiz.cancelPay(outTradeNo);
-            userMemberChargeBiz.close(outTradeNo);
+            // 关闭前先查询订单状态，以防已支付完成
+            AliPayStatusResponse response = aliPayStatus(outTradeNo);
+            if (response.getTradeState().equals(AliPayStateEnum.WAIT_BUYER_PAY.getCode())){
+                aliPayBiz.cancelPay(outTradeNo);
+                userMemberChargeBiz.close(outTradeNo);
+            }
         } catch (Exception e) {
             log.error("取消支付宝支付失败：" + e.getMessage());
             throw new PayException(e.getMessage());
@@ -221,8 +225,12 @@ public class PaymentBizImpl implements PaymentBiz {
     @Override
     public void closeWxPay(String outTradeNo) throws PayException {
         try {
-            wechatPayBiz.closePay(outTradeNo);
-            userMemberChargeBiz.close(outTradeNo);
+            // 关闭前先查询订单状态，以防已支付完成
+            WxPayStatusResponse response = wxPayStatus(outTradeNo);
+            if (response.getTradeState().equals(WechatPayStateEnum.NOT_PAY.getCode())){
+                wechatPayBiz.closePay(outTradeNo);
+                userMemberChargeBiz.close(outTradeNo);
+            }
         } catch (Exception e) {
             log.error("取消微信支付失败：" + e.getMessage());
             throw new PayException(e.getMessage());
