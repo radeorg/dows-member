@@ -2,6 +2,7 @@ package org.dows.member.biz.user.impl;
 
 import com.mybatisflex.core.query.QueryWrapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.dows.hrm.api.EmailSettingApi;
 import org.dows.member.constant.MemberExceptionStatusCode;
 import org.dows.member.entity.MemberChargeEntity;
@@ -22,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class UserMemberInstanceBizImpl implements UserMemberInstanceBiz {
@@ -86,8 +88,12 @@ public class UserMemberInstanceBizImpl implements UserMemberInstanceBiz {
         // 更新或新增会员度量表
         userMemberMetricsHandler.saveOrUpdate(oldInstance, interests);
 
-        // 邮箱配置设置为重连，继续读取邮件
-        emailSettingApi.reconnect();
+        try {
+            // 邮箱配置设置为重连，继续读取邮件
+            emailSettingApi.reconnectByAccountInstanceId(newInstance.getAccountInstanceId());
+        } catch (Exception e) {
+            log.error("重连邮箱失败：{}" , e.getMessage());
+        }
     }
 
     @Transactional
@@ -117,8 +123,12 @@ public class UserMemberInstanceBizImpl implements UserMemberInstanceBiz {
         // 更新或新增会员度量表
         userMemberMetricsHandler.saveOrUpdate(oldInstance, interests);
 
-        // 邮箱配置设置为重连，继续读取邮件
-        emailSettingApi.reconnect();
+        try {
+            // 邮箱配置设置为重连，继续读取邮件
+            emailSettingApi.reconnectByAccountInstanceId(newInstance.getAccountInstanceId());
+        } catch (Exception e) {
+            log.error("重连邮箱失败：{}" , e.getMessage());
+        }
     }
 
     @Transactional
@@ -147,8 +157,12 @@ public class UserMemberInstanceBizImpl implements UserMemberInstanceBiz {
             // 更新或新增会员度量表
             userMemberMetricsHandler.saveOrUpdate(oldInstance, interests);
 
-            // 邮箱配置设置为断开，不继续读取邮件
-            emailSettingApi.disconnect(newInstance.getAccountInstanceId());
+            try {
+                // 邮箱配置设置为断开，不继续读取邮件
+                emailSettingApi.disconnect(newInstance.getAccountInstanceId());
+            } catch (Exception e) {
+                log.error("重连邮箱失败：{}" , e.getMessage());
+            }
         }
     }
 
